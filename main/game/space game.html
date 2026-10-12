@@ -2176,7 +2176,7 @@
                 const tx = -ny;
                 const ty = nx;
                 const velAlongTang = rvx * tx + rvy * ty;
-                const frictionImpulse = -velAlongTang * 0.35 / (1 / mass1 + 1 / mass2);
+                const frictionImpulse = -velAlongTang * 0.18 / (1 / mass1 + 1 / mass2);
 
                 p1.vx -= (frictionImpulse / mass1) * tx;
                 p1.vy -= (frictionImpulse / mass1) * ty;
