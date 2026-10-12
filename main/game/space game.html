@@ -2235,7 +2235,7 @@
         if (p.vy > 0) {
           const impact = Math.abs(p.vy);
           p.vy = -p.vy * 0.22;
-          p.vx *= 0.82;
+          p.vx *= 0.98;
           if (impact > 60) {
             p.triggerSquash(impact);
             audio.playBounce(p.r, impact);
