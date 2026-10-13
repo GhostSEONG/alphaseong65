@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
   <title>Space Merge: Cosmic Planets (스페이스 머지)</title>
   <style>
     /* CSS RESET & FONTS */
@@ -32,6 +32,14 @@
       --font-family: 'Pretendard', 'Fredoka', 'Quicksand', 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      touch-action: none;
+    }
+
     body {
       background-color: var(--bg-deep);
       background-image: 
@@ -41,25 +49,23 @@
         linear-gradient(180deg, #050711 0%, #0b0f24 50%, #060814 100%);
       color: var(--text-main);
       font-family: var(--font-family);
-      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      touch-action: none;
     }
 
     #app-container {
       position: relative;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       max-width: 1200px;
-      max-height: 900px;
+      max-height: 960px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       padding: 10px;
+      box-sizing: border-box;
     }
 
     /* TOP HEADER BAR */
@@ -72,11 +78,13 @@
       padding: 8px 16px;
       background: var(--bg-panel);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border-hull);
       border-radius: 20px;
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       margin-bottom: 8px;
       z-index: 10;
+      flex-shrink: 0;
     }
 
     .brand-group {
@@ -161,11 +169,13 @@
     #game-stage {
       display: flex;
       justify-content: center;
-      align-items: stretch;
+      align-items: center;
       gap: 18px;
       position: relative;
-      height: calc(100vh - 84px);
-      max-height: 780px;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      max-height: 840px;
     }
 
     /* SIDE PANELS */
@@ -175,11 +185,13 @@
       gap: 14px;
       width: 175px;
       z-index: 5;
+      flex-shrink: 0;
     }
 
     .hud-card {
       background: var(--bg-panel);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border-hull);
       border-radius: 18px;
       padding: 12px 14px;
@@ -205,6 +217,7 @@
       color: var(--accent-gold);
       text-shadow: 0 0 10px rgba(255, 209, 102, 0.4);
       transition: transform 0.15s ease;
+      white-space: nowrap;
     }
 
     .score-value.bump {
@@ -216,6 +229,7 @@
       font-size: 1.2rem;
       font-weight: 800;
       color: var(--accent-cyan);
+      white-space: nowrap;
     }
 
     /* NEXT PREVIEW BOX */
@@ -231,6 +245,7 @@
       background: radial-gradient(circle at 35% 35%, rgba(6, 214, 160, 0.15), rgba(0, 0, 0, 0.6));
       border: 1px dashed rgba(6, 214, 160, 0.4);
       box-shadow: inset 0 0 15px rgba(6, 214, 160, 0.15);
+      flex-shrink: 0;
     }
 
     #next-canvas {
@@ -244,6 +259,10 @@
       color: var(--text-main);
       margin-top: 4px;
       line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .next-tier-badge {
@@ -274,6 +293,10 @@
       font-size: 0.74rem;
       color: var(--text-sub);
       line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
     .goal-progress-bar {
       width: 100%;
@@ -311,6 +334,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      flex: 1;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
+      width: 100%;
     }
 
     #game-canvas {
@@ -322,16 +350,24 @@
         inset 0 0 25px rgba(255, 255, 255, 0.04);
       cursor: crosshair;
       touch-action: none;
+      /* Responsive sizing ensuring exact aspect ratio */
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 440 / 660;
+      object-fit: contain;
     }
 
     /* DANGER WARNING OVERLAY */
     #danger-banner {
       position: absolute;
-      top: 145px;
+      top: 22%;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(239, 71, 111, 0.92);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       color: #fff;
       padding: 5px 16px;
       border-radius: 20px;
@@ -346,6 +382,7 @@
       gap: 6px;
       animation: pulse-danger 0.5s infinite alternate;
       z-index: 8;
+      white-space: nowrap;
     }
 
     @keyframes pulse-danger {
@@ -356,9 +393,9 @@
     /* DISCOVERY TOAST */
     #discovery-toast {
       position: absolute;
-      top: 20px;
+      top: 16px;
       left: 50%;
-      transform: translateX(-50%) translateY(-90px);
+      transform: translateX(-50%) translateY(-110px);
       background: linear-gradient(135deg, rgba(20, 32, 70, 0.98), rgba(30, 48, 100, 0.98));
       border: 2px solid var(--accent-gold);
       border-radius: 24px;
@@ -370,6 +407,7 @@
       z-index: 150;
       pointer-events: none;
       transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      max-width: 90vw;
     }
     #discovery-toast.visible {
       transform: translateX(-50%) translateY(0);
@@ -404,6 +442,7 @@
       inset: 0;
       background: rgba(5, 8, 18, 0.88);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -425,18 +464,18 @@
       box-shadow: 0 18px 50px rgba(0, 0, 0, 0.75), 0 0 30px rgba(6, 214, 160, 0.15);
       width: 100%;
       max-width: 490px;
-      padding: 26px 30px;
+      padding: 24px 26px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       position: relative;
-      max-height: 90vh;
+      max-height: 88dvh;
       overflow-y: auto;
     }
 
     .modal-title {
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       font-weight: 900;
       color: var(--text-main);
       margin-bottom: 6px;
@@ -444,7 +483,7 @@
     .modal-subtitle {
       font-size: 0.86rem;
       color: var(--text-sub);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       line-height: 1.35;
     }
 
@@ -528,6 +567,7 @@
       inset: 0;
       background: radial-gradient(circle at 50% 35%, rgba(20, 28, 65, 0.97), rgba(5, 8, 20, 0.99));
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -560,7 +600,7 @@
     }
 
     .title-main-text {
-      font-size: 2.6rem;
+      font-size: 2.5rem;
       font-weight: 900;
       color: var(--text-main);
       text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(6, 214, 160, 0.4);
@@ -577,21 +617,22 @@
       margin-top: 6px;
       max-width: 380px;
       line-height: 1.35;
+      text-align: center;
     }
 
     /* ALMANAC GRID */
     #almanac-modal .modal-card {
       max-width: 680px;
-      padding: 24px;
+      padding: 22px;
     }
 
     .almanac-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
       gap: 10px;
       width: 100%;
-      margin: 16px 0;
-      max-height: 48vh;
+      margin: 14px 0;
+      max-height: 44vh;
       overflow-y: auto;
       padding: 6px;
     }
@@ -723,11 +764,11 @@
 
     /* RESULTS SCREEN */
     .results-score-big {
-      font-size: 3rem;
+      font-size: 2.8rem;
       font-weight: 900;
       color: var(--accent-gold);
       text-shadow: 0 0 20px rgba(255, 209, 102, 0.5);
-      margin: 6px 0;
+      margin: 4px 0;
     }
 
     .results-badge-new {
@@ -746,7 +787,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       width: 100%;
-      margin: 14px 0;
+      margin: 12px 0;
     }
 
     .result-stat-box {
@@ -774,7 +815,7 @@
     /* TUTORIAL BANNER */
     #tutorial-card {
       position: absolute;
-      bottom: 24px;
+      bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
       background: linear-gradient(135deg, rgba(19, 25, 54, 0.95), rgba(28, 40, 85, 0.95));
@@ -784,9 +825,9 @@
       box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 15px rgba(6, 214, 160, 0.3);
       display: flex;
       align-items: center;
-      gap: 16px;
-      max-width: 490px;
-      width: 90%;
+      gap: 14px;
+      max-width: 480px;
+      width: 92%;
       z-index: 40;
       pointer-events: auto;
       animation: float-soft 3s ease-in-out infinite;
@@ -821,47 +862,152 @@
       flex-shrink: 0;
     }
 
-    /* RESPONSIVE LAYOUTS */
+    /* ==========================================================================
+       RESPONSIVE LAYOUTS & MOBILE OPTIMIZATIONS
+       ========================================================================== */
     @media (max-width: 768px) {
+      #app-container {
+        padding: 6px 8px;
+        justify-content: flex-start;
+        gap: 6px;
+      }
+
       #top-bar {
-        padding: 4px 10px;
+        padding: 6px 12px;
         margin-bottom: 4px;
+        border-radius: 16px;
       }
       .brand-title {
-        font-size: 0.95rem;
+        font-size: 1rem;
       }
+      .brand-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 17px;
+      }
+      .icon-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+        border-radius: 10px;
+      }
+      .lang-btn {
+        font-size: 0.75rem;
+        padding: 0 8px;
+        min-width: 38px;
+      }
+
+      /* On mobile portrait: HUD cards are placed above the canvas in a unified horizontal ribbon */
       #game-stage {
         flex-direction: column;
         align-items: center;
         gap: 6px;
-        height: auto;
-      }
-      .side-panel {
-        flex-direction: row;
         width: 100%;
-        max-width: 420px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .side-panel {
+        width: 100%;
+        max-width: 480px;
+        flex-direction: row;
+        gap: 6px;
+      }
+
+      .side-panel.left-panel {
+        order: 1;
+        display: flex;
         justify-content: space-between;
       }
-      .side-panel.left-panel, .side-panel.right-panel {
-        width: 100%;
+
+      .side-panel.right-panel {
+        order: 2;
+        display: flex;
       }
+
+      /* Combine Left & Right HUD elements into a clean status row */
+      .side-panel.left-panel .hud-card,
+      .side-panel.right-panel .hud-card {
+        flex: 1;
+        padding: 6px 8px;
+        border-radius: 14px;
+        min-width: 0;
+      }
+
       .side-panel .controls-card {
         display: none;
       }
-      .hud-card {
-        flex: 1;
-        padding: 6px 10px;
-      }
+
       .score-value {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
       }
+      .best-value {
+        font-size: 1.05rem;
+      }
+
       #next-preview-box {
-        width: 60px;
-        height: 60px;
+        width: 42px;
+        height: 42px;
+        margin: 0;
       }
       #next-canvas {
-        width: 50px;
-        height: 50px;
+        width: 36px;
+        height: 36px;
+      }
+      .next-name {
+        font-size: 0.72rem;
+        margin-top: 2px;
+      }
+      .next-tier-badge {
+        display: none;
+      }
+
+      .goal-card {
+        display: none;
+      }
+
+      /* Gravity Chamber takes maximum possible height while preserving aspect ratio */
+      #terrarium-container {
+        order: 3;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #game-canvas {
+        border-radius: 20px;
+        max-height: 100%;
+        max-width: 100%;
+        aspect-ratio: 440 / 660;
+        object-fit: contain;
+      }
+
+      /* Compact Modal adjustments */
+      .modal-card {
+        padding: 18px 16px;
+        border-radius: 20px;
+      }
+      .modal-title {
+        font-size: 1.35rem;
+      }
+      .almanac-grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 6px;
+      }
+      .almanac-thumb {
+        width: 44px;
+        height: 44px;
+      }
+      #almanac-detail-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+      }
+      .slider {
+        width: 90px;
       }
     }
 
@@ -875,18 +1021,29 @@
       #game-stage {
         flex-direction: row;
         align-items: center;
-        gap: 12px;
-        height: 98vh;
+        gap: 10px;
+        height: 98dvh;
       }
       .side-panel {
-        width: 130px;
+        width: 120px;
         gap: 6px;
       }
       .hud-card {
-        padding: 6px 8px;
+        padding: 5px 6px;
       }
       .score-value {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
+      }
+      #next-preview-box {
+        width: 50px;
+        height: 50px;
+      }
+      #next-canvas {
+        width: 44px;
+        height: 44px;
+      }
+      .controls-card {
+        display: none;
       }
     }
   </style>
@@ -977,7 +1134,7 @@
       <div class="tut-icon">🚀</div>
       <div class="tut-text" id="tut-card-text">
         <strong>우주 중력 챔버에 오신 것을 환영합니다!</strong><br>
-        마우스나 방향키로 조준하고 천체를 투하하세요. 같은 행성 2개가 충돌하면 더 거대한 상위 천체로 융합합니다! 상단 레이저 억제선을 넘지 않도록 균형을 잡으세요!
+        화면을 터치하거나 마우스로 조준하고 손을 떼어 천체를 투하하세요. 같은 행성 2개가 충돌하면 더 거대한 상위 천체로 융합합니다! 상단 레이저 억제선을 넘지 않도록 균형을 잡으세요!
       </div>
       <button class="tut-btn" id="btn-tut-dismiss">준비 완료!</button>
     </div>
@@ -1187,7 +1344,7 @@
         dangerBanner: (sec) => `⚠️ 중력 붕괴 위험! ${sec}초 ⚠️`,
         toastTitle: "새로운 천체 발견!",
         tutTitle: "우주 중력 챔버에 오신 것을 환영합니다!",
-        tutText: "마우스나 방향키로 조준하고 천체를 투하하세요. 같은 행성 2개가 충돌하면 더 거대한 상위 천체로 융합합니다! 상단 레이저 억제선을 넘지 않도록 균형을 잡으세요.",
+        tutText: "화면을 터치하거나 마우스로 조준하고 손을 떼어 천체를 투하하세요. 같은 행성 2개가 충돌하면 더 거대한 상위 천체로 융합합니다! 상단 레이저 억제선을 넘지 않도록 균형을 잡으세요.",
         tutDismiss: "준비 완료!",
         gameOverTitle: "중력 억제 한계 도달!",
         gameOverSubtitle: "행성들이 중력 챔버 궤도를 벗어났습니다.",
@@ -1242,7 +1399,7 @@
         dangerBanner: (sec) => `⚠️ GRAVITY BREACH! ${sec}s ⚠️`,
         toastTitle: "New Celestial Body Discovered!",
         tutTitle: "Welcome to the Gravity Vessel!",
-        tutText: "Aim the orbital dropper with your mouse or keys and release. Match 2 identical worlds to merge them into larger, grander celestial bodies. Keep the stack below the laser containment line!",
+        tutText: "Touch or drag to aim the orbital dropper, then release to drop. Match 2 identical worlds to merge them into larger, grander celestial bodies. Keep the stack below the laser containment line!",
         tutDismiss: "All Systems Go!",
         gameOverTitle: "Containment Overload!",
         gameOverSubtitle: "Planetary mass has breached the orbital boundary.",
@@ -1277,7 +1434,7 @@
       }
     };
 
-    let currentLang = safeStorage.getItem('spore_lang') || 'ko';
+    let currentLang = safeStorage.getItem('space_lang') || 'ko';
     function t(key, ...args) {
       const dict = I18N[currentLang] || I18N.ko;
       const val = dict[key];
@@ -1526,13 +1683,12 @@
       scheduleMusicStep() {
         if (!this.isMusicPlaying || !this.ctx) return;
 
-        // Ambient Cosmic Chords: D Lydian / A Dorian (D, F#, A, C#, E, G#)
         const NOTES = [293.66, 369.99, 440.00, 554.37, 659.25, 739.99, 880.00, 1108.73];
         const CHORDS = [
-          [146.83, 220.00, 293.66], // D root
-          [110.00, 164.81, 220.00], // A root
-          [130.81, 196.00, 261.63], // C root
-          [164.81, 246.94, 329.63]  // E root
+          [146.83, 220.00, 293.66],
+          [110.00, 164.81, 220.00],
+          [130.81, 196.00, 261.63],
+          [164.81, 246.94, 329.63]
         ];
 
         const chordIdx = Math.floor(this.musicStep / 8) % CHORDS.length;
@@ -1860,6 +2016,9 @@
 
     let aimX = CANVAS_WIDTH / 2;
     let aimTargetX = CANVAS_WIDTH / 2;
+    let isPointerActive = false;
+    let activePointerId = null;
+
     let dropCooldown = 0;
     let currentDropTier = 1;
     let nextDropTier = 2;
@@ -2113,7 +2272,6 @@
           p.x += p.vx * dtSub;
           p.y += p.vy * dtSub;
 
-          // Stable upright orientation: damp rotation strongly and return upright when settled
           if (p.settled || (Math.abs(p.vx) < 20 && Math.abs(p.vy) < 20)) {
             p.vAngle = 0;
             p.angle *= 0.82;
@@ -2247,7 +2405,7 @@
         if (p.vy > 0) {
           const impact = Math.abs(p.vy);
           p.vy = -p.vy * 0.22;
-          p.vx *= 0.95; // Smooth faster roll on floor
+          p.vx *= 0.95;
           if (impact > 60) {
             p.triggerSquash(impact);
             audio.playBounce(p.r, impact);
@@ -2407,14 +2565,21 @@
     }
 
     /* ==========================================================================
-       7. DROPPER CONTROLS & DANGER SYSTEM
+       7. DROPPER CONTROLS & DANGER SYSTEM (ACCURATE TOUCH & INSTANT AIM FIX)
        ========================================================================== */
-    function dropMushroom() {
+    function dropMushroom(explicitX) {
       if (dropCooldown > 0 || isGameOver || isPaused || inTitleScreen) return;
 
       const currentTierData = PLANETS[currentDropTier - 1];
       const radius = currentTierData.radius;
-      const clampedX = Math.max(WALL_LEFT + radius, Math.min(WALL_RIGHT - radius, aimX));
+      
+      // Use explicit drop position if provided, otherwise aimX
+      const targetX = (explicitX !== undefined) ? explicitX : aimX;
+      const clampedX = Math.max(WALL_LEFT + radius, Math.min(WALL_RIGHT - radius, targetX));
+
+      // Synchronize aim positions instantly on drop
+      aimX = clampedX;
+      aimTargetX = clampedX;
 
       const newPlanet = new Planet(currentDropTier, clampedX, DROP_Y);
       newPlanet.vx = (Math.random() - 0.5) * 15;
@@ -2571,10 +2736,9 @@
       c.save();
       c.beginPath();
       c.arc(0, 0, r, 0, Math.PI * 2);
-      c.clip(); // Keep features inside planetary circle
+      c.clip();
 
       if (data.feature === "heart_glacier") {
-        // Pluto's Heart (Tombaugh Regio)
         c.fillStyle = "#fff8f0";
         c.beginPath();
         c.moveTo(-r * 0.1, r * 0.4);
@@ -2585,7 +2749,6 @@
         c.closePath();
         c.fill();
       } else if (data.feature === "craters") {
-        // Lunar Maria & Impact Craters
         c.fillStyle = "rgba(70, 75, 85, 0.45)";
         c.beginPath();
         c.arc(-r * 0.4, -r * 0.3, r * 0.26, 0, Math.PI * 2);
@@ -2594,14 +2757,12 @@
         c.arc(r * 0.4, r * 0.3, r * 0.18, 0, Math.PI * 2);
         c.fill();
       } else if (data.feature === "solar_glint") {
-        // Mercury's Iron Ridge Streaks
         c.strokeStyle = "rgba(255, 220, 120, 0.35)";
         c.lineWidth = r * 0.08;
         c.beginPath();
         c.arc(0, 0, r * 0.6, 0.3, Math.PI - 0.3);
         c.stroke();
       } else if (data.feature === "ice_cap") {
-        // Mars Polar Dry Ice Caps & Valles Marineris
         c.fillStyle = "#ffffff";
         c.beginPath();
         c.ellipse(0, -r * 0.82, r * 0.35, r * 0.12, 0, 0, Math.PI * 2);
@@ -2612,7 +2773,6 @@
         c.arc(0, r * 0.3, r * 0.5, 0.2, Math.PI - 0.2);
         c.stroke();
       } else if (data.feature === "golden_swirl") {
-        // Venus Dense Sulfuric Swirls
         c.strokeStyle = "rgba(255, 235, 170, 0.4)";
         c.lineWidth = r * 0.12;
         c.beginPath();
@@ -2620,7 +2780,6 @@
         c.arc(0, r * 0.2, r * 0.7, 0.2, Math.PI - 0.2);
         c.stroke();
       } else if (data.feature === "continents_clouds") {
-        // Earth's Continents & Cloud Wisps
         c.fillStyle = "#27ae60";
         c.beginPath();
         c.arc(-r * 0.3, -r * 0.2, r * 0.35, 0, Math.PI * 2);
@@ -2634,7 +2793,6 @@
         c.ellipse(r * 0.1, r * 0.1, r * 0.6, r * 0.09, -0.15, 0, Math.PI * 2);
         c.fill();
       } else if (data.feature === "dark_spot") {
-        // Neptune's Great Dark Spot & Supersonic Cirrus
         c.fillStyle = "#154360";
         c.beginPath();
         c.ellipse(r * 0.35, -r * 0.2, r * 0.25, r * 0.15, -0.2, 0, Math.PI * 2);
@@ -2645,14 +2803,12 @@
         c.arc(0, r * 0.2, r * 0.8, 0.2, Math.PI - 0.2);
         c.stroke();
       } else if (data.feature === "vertical_ring") {
-        // Uranus Faint Rings
         c.strokeStyle = "rgba(220, 255, 250, 0.35)";
         c.lineWidth = 2.5;
         c.beginPath();
         c.ellipse(0, 0, r * 0.25, r * 1.15, 0, 0, Math.PI * 2);
         c.stroke();
       } else if (data.feature === "majestic_rings") {
-        // Saturn Banded Atmosphere
         c.strokeStyle = "rgba(180, 110, 20, 0.3)";
         c.lineWidth = r * 0.1;
         c.beginPath();
@@ -2660,12 +2816,10 @@
         c.arc(0, r * 0.3, r * 0.7, 0.2, Math.PI - 0.2);
         c.stroke();
       } else if (data.feature === "great_red_spot") {
-        // Jupiter's Swirling Bands & Great Red Spot
         c.fillStyle = "rgba(120, 50, 10, 0.4)";
         c.fillRect(-r, -r * 0.5, r * 2, r * 0.18);
         c.fillRect(-r, -r * 0.15, r * 2, r * 0.18);
         c.fillRect(-r, r * 0.25, r * 2, r * 0.2);
-        // Great Red Spot
         c.fillStyle = "#C0392B";
         c.beginPath();
         c.ellipse(r * 0.4, r * 0.1, r * 0.24, r * 0.15, 0, 0, Math.PI * 2);
@@ -2675,7 +2829,6 @@
         c.ellipse(r * 0.4, r * 0.1, r * 0.14, r * 0.08, 0, 0, Math.PI * 2);
         c.fill();
       } else if (data.feature === "solar_prominence") {
-        // Sun Solar Flare Prominences & Corona
         const time = performance.now() * 0.003;
         c.fillStyle = "rgba(255, 230, 0, 0.35)";
         for (let k = 0; k < 6; k++) {
@@ -2693,14 +2846,12 @@
 
     function drawSaturnRingsBack(c, r) {
       c.save();
-      c.rotate(-0.35); // Majestic ring tilt
+      c.rotate(-0.35);
       c.strokeStyle = "rgba(245, 176, 65, 0.55)";
       c.lineWidth = r * 0.26;
       c.beginPath();
-      // Draw back half of ellipse
       c.ellipse(0, 0, r * 1.7, r * 0.45, 0, Math.PI, Math.PI * 2);
       c.stroke();
-      // Cassini Division line
       c.strokeStyle = "rgba(20, 25, 45, 0.8)";
       c.lineWidth = r * 0.035;
       c.beginPath();
@@ -2715,10 +2866,8 @@
       c.strokeStyle = "rgba(245, 176, 65, 0.65)";
       c.lineWidth = r * 0.26;
       c.beginPath();
-      // Draw front half of ellipse
       c.ellipse(0, 0, r * 1.7, r * 0.45, 0, 0, Math.PI);
       c.stroke();
-      // Cassini Division line
       c.strokeStyle = "rgba(20, 25, 45, 0.8)";
       c.lineWidth = r * 0.035;
       c.beginPath();
@@ -2728,14 +2877,12 @@
     }
 
     function drawPlanetFace(c, p, data, r, isPreview) {
-      // Cheeks
       c.fillStyle = "rgba(255, 120, 150, 0.55)";
       c.beginPath();
       c.ellipse(-r * 0.32, r * 0.18, r * 0.14, r * 0.08, 0, 0, Math.PI * 2);
       c.ellipse(r * 0.32, r * 0.18, r * 0.14, r * 0.08, 0, 0, Math.PI * 2);
       c.fill();
 
-      // Eyes
       const eyeY = r * 0.06;
       const eyeDist = r * 0.26;
       const eyeSize = r * 0.11;
@@ -2768,7 +2915,6 @@
         c.arc(eyeDist, eyeY, eyeSize, 0, Math.PI * 2);
         c.fill();
 
-        // White highlights
         c.fillStyle = "#ffffff";
         c.beginPath();
         c.arc(-eyeDist + gazeX - eyeSize * 0.3, eyeY + gazeY - eyeSize * 0.3, eyeSize * 0.42, 0, Math.PI * 2);
@@ -2780,7 +2926,6 @@
         c.fill();
       }
 
-      // Mouth
       const mouthY = r * 0.22;
       c.strokeStyle = "#121422";
       c.lineWidth = 2;
@@ -2799,9 +2944,7 @@
       }
     }
 
-    /* Cosmic Background & Starry Chamber */
     function drawTerrariumBackground(c) {
-      // Space Nebula base
       const nebGrad = c.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
       nebGrad.addColorStop(0, "#080c1e");
       nebGrad.addColorStop(0.5, "#0d132e");
@@ -2812,7 +2955,6 @@
       c.roundRect(WALL_LEFT, 20, WALL_RIGHT - WALL_LEFT, FLOOR_Y - 20 + 26, [CORNER_RADIUS, CORNER_RADIUS, CORNER_RADIUS, CORNER_RADIUS]);
       c.fill();
 
-      // Cosmic Dust & Nebulae
       const cloudGrad = c.createRadialGradient(CANVAS_WIDTH * 0.3, CANVAS_HEIGHT * 0.4, 30, CANVAS_WIDTH * 0.3, CANVAS_HEIGHT * 0.4, 180);
       cloudGrad.addColorStop(0, "rgba(6, 214, 160, 0.12)");
       cloudGrad.addColorStop(1, "transparent");
@@ -2825,11 +2967,9 @@
       c.fillStyle = cloudGrad2;
       c.fillRect(WALL_LEFT, 20, WALL_RIGHT - WALL_LEFT, FLOOR_Y);
 
-      // Stars & Meteors
       stars.forEach(st => st.draw(c));
       meteors.forEach(m => m.draw(c));
 
-      // Bottom Gravity Platform
       const floorGrad = c.createLinearGradient(0, FLOOR_Y - 14, 0, CANVAS_HEIGHT);
       floorGrad.addColorStop(0, "#192248");
       floorGrad.addColorStop(0.4, "#0e132c");
@@ -2840,7 +2980,6 @@
       c.roundRect(WALL_LEFT, FLOOR_Y - 12, WALL_RIGHT - WALL_LEFT, CANVAS_HEIGHT - FLOOR_Y + 12, [0, 0, CORNER_RADIUS, CORNER_RADIUS]);
       c.fill();
 
-      // Neon conduits on floor
       c.strokeStyle = "rgba(6, 214, 160, 0.4)";
       c.lineWidth = 2;
       c.beginPath();
@@ -2870,7 +3009,6 @@
       c.setLineDash([]);
       c.shadowBlur = 0;
 
-      // Laser emitters on the edges
       c.fillStyle = isDanger ? "#ef476f" : "#06d6a0";
       c.beginPath();
       c.arc(WALL_LEFT + 10, DANGER_Y, 4, 0, Math.PI * 2);
@@ -2881,14 +3019,12 @@
     }
 
     function drawTerrariumGlassOverlay(c) {
-      // Sleek Metallic Vessel Hull
       c.strokeStyle = "rgba(255, 255, 255, 0.2)";
       c.lineWidth = 3;
       c.beginPath();
       c.roundRect(WALL_LEFT, 20, WALL_RIGHT - WALL_LEFT, FLOOR_Y - 20 + 26, [CORNER_RADIUS, CORNER_RADIUS, CORNER_RADIUS, CORNER_RADIUS]);
       c.stroke();
 
-      // Specular reflections
       const specGrad = c.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       specGrad.addColorStop(0, "rgba(255, 255, 255, 0.08)");
       specGrad.addColorStop(0.3, "rgba(255, 255, 255, 0.015)");
@@ -2923,8 +3059,8 @@
       }
 
       c.save();
-      c.strokeStyle = "rgba(6, 214, 160, 0.35)";
-      c.lineWidth = 1.8;
+      c.strokeStyle = isPointerActive ? "rgba(6, 214, 160, 0.7)" : "rgba(6, 214, 160, 0.35)";
+      c.lineWidth = isPointerActive ? 2.2 : 1.8;
       c.setLineDash([5, 5]);
 
       c.beginPath();
@@ -2933,7 +3069,7 @@
       c.stroke();
 
       c.setLineDash([]);
-      c.strokeStyle = "rgba(255, 209, 102, 0.45)";
+      c.strokeStyle = isPointerActive ? "rgba(255, 209, 102, 0.85)" : "rgba(255, 209, 102, 0.45)";
       c.lineWidth = 1.5;
       c.beginPath();
       c.arc(clampedAimX, landingY, radius, 0, Math.PI * 2);
@@ -2952,14 +3088,13 @@
       };
       drawPlanet(c, mockHeld, clampedAimX, DROP_Y, 1, true);
 
-      // Quantum Gravity Projector at the top
       c.fillStyle = "#2a3560";
       c.beginPath();
       c.roundRect(clampedAimX - 10, 8, 20, DROP_Y - radius - 8, [4, 4, 8, 8]);
       c.fill();
-      c.fillStyle = "#06d6a0";
+      c.fillStyle = isPointerActive ? "#ffd166" : "#06d6a0";
       c.beginPath();
-      c.arc(clampedAimX, DROP_Y - radius - 2, 3, 0, Math.PI * 2);
+      c.arc(clampedAimX, DROP_Y - radius - 2, 3.5, 0, Math.PI * 2);
       c.fill();
     }
 
@@ -3057,11 +3192,15 @@
       if (isPaused || inTitleScreen || isGameOver) return;
 
       const keyboardSpeed = 380;
+      let movedByKeyboard = false;
+
       if (keys.left) {
         aimTargetX -= keyboardSpeed * dt;
+        movedByKeyboard = true;
       }
       if (keys.right) {
         aimTargetX += keyboardSpeed * dt;
+        movedByKeyboard = true;
       }
 
       const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -3070,9 +3209,16 @@
         const axisX = gp.axes[0] || 0;
         if (Math.abs(axisX) > 0.15) {
           aimTargetX += axisX * keyboardSpeed * dt;
+          movedByKeyboard = true;
         }
-        if (gp.buttons[14] && gp.buttons[14].pressed) aimTargetX -= keyboardSpeed * dt;
-        if (gp.buttons[15] && gp.buttons[15].pressed) aimTargetX += keyboardSpeed * dt;
+        if (gp.buttons[14] && gp.buttons[14].pressed) {
+          aimTargetX -= keyboardSpeed * dt;
+          movedByKeyboard = true;
+        }
+        if (gp.buttons[15] && gp.buttons[15].pressed) {
+          aimTargetX += keyboardSpeed * dt;
+          movedByKeyboard = true;
+        }
 
         if ((gp.buttons[0] && gp.buttons[0].pressed) || (gp.buttons[7] && gp.buttons[7].pressed)) {
           if (!keys.dropPressedLastFrame) {
@@ -3095,7 +3241,14 @@
 
       const currentRadius = PLANETS[currentDropTier - 1].radius;
       aimTargetX = Math.max(WALL_LEFT + currentRadius, Math.min(WALL_RIGHT - currentRadius, aimTargetX));
-      aimX += (aimTargetX - aimX) * 0.28;
+
+      if (movedByKeyboard) {
+        // Smooth lerp when moving with keyboard or gamepad stick
+        aimX += (aimTargetX - aimX) * 0.35;
+      } else if (!isPointerActive) {
+        // When idle or using mouse hover, keep aim synchronized
+        aimX += (aimTargetX - aimX) * 0.45;
+      }
     }
 
     /* ==========================================================================
@@ -3213,10 +3366,8 @@
       currentLang = lang === 'en' ? 'en' : 'ko';
       safeStorage.setItem('space_lang', currentLang);
 
-      // Update Header Lang Toggle Button
       document.getElementById('btn-lang-toggle').textContent = currentLang === 'ko' ? '한국어' : 'English';
 
-      // Update Brand & HUD
       document.getElementById('txt-brand-title').innerHTML = t("brand");
       document.getElementById('lbl-hud-score').textContent = t("scoreLabel");
       document.getElementById('lbl-hud-best').textContent = t("bestLabel");
@@ -3225,14 +3376,12 @@
       document.getElementById('lbl-hud-controls').textContent = t("controlsTitle");
       document.getElementById('hud-controls-hint').innerHTML = t("controlsHint");
 
-      // Update Title Screen
       document.getElementById('title-main-h1').innerHTML = t("brand");
       document.getElementById('title-tagline-p').textContent = t("tagline");
       document.getElementById('btn-title-play').textContent = t("enterGame");
       document.getElementById('btn-title-almanac').textContent = t("almanacBtn");
       document.getElementById('btn-title-settings').textContent = t("settingsBtn");
 
-      // Update Pause Screen
       document.getElementById('pause-modal-title').textContent = t("pauseTitle");
       document.getElementById('pause-modal-sub').textContent = t("pauseSubtitle");
       document.getElementById('btn-pause-resume').textContent = t("resumeBtn");
@@ -3240,7 +3389,6 @@
       document.getElementById('btn-pause-settings').textContent = t("settingsBtn");
       document.getElementById('btn-pause-title').textContent = t("titleBtn");
 
-      // Update Results Screen
       document.getElementById('results-modal-title').textContent = t("gameOverTitle");
       document.getElementById('results-modal-sub').textContent = t("gameOverSubtitle");
       document.getElementById('results-score-lbl').textContent = t("finalScoreLabel");
@@ -3252,10 +3400,8 @@
       document.getElementById('btn-results-almanac').textContent = t("almanacBtn");
       document.getElementById('btn-results-title').textContent = t("titleBtn");
 
-      // Update Almanac Modal
       document.getElementById('almanac-modal-title').textContent = t("almanacTitle");
 
-      // Update Settings Modal
       document.getElementById('settings-modal-title').textContent = t("settingsTitle");
       document.getElementById('settings-modal-sub').textContent = t("settingsSubtitle");
       document.getElementById('setting-lbl-lang').textContent = t("langLabel");
@@ -3268,15 +3414,12 @@
       document.getElementById('setting-reset-data-btn').textContent = t("resetBtn");
       document.getElementById('btn-settings-save').textContent = t("doneBtn");
 
-      // Settings Lang Toggle Active State
       document.getElementById('setting-lang-ko-btn').className = "toggle-btn " + (currentLang === 'ko' ? 'active' : '');
       document.getElementById('setting-lang-en-btn').className = "toggle-btn " + (currentLang === 'en' ? 'active' : '');
 
-      // Tutorial Card
       document.getElementById('tut-card-text').innerHTML = `<strong>${t("tutTitle")}</strong><br>${t("tutText")}`;
       document.getElementById('btn-tut-dismiss').textContent = t("tutDismiss");
 
-      // Refresh Dynamic Panels
       renderNextPiecePreview();
       updateHUDGoal();
       buildAlmanacGrid();
@@ -3287,7 +3430,7 @@
     }
 
     /* ==========================================================================
-       12. UI EVENT LISTENERS & MODAL MANAGEMENT
+       12. UI EVENT LISTENERS & PRECISE POINTER/TOUCH CONTROLS
        ========================================================================== */
     function closeAllModals() {
       document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
@@ -3305,30 +3448,78 @@
       }
     }
 
+    function calculateCanvasPointerX(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = CANVAS_WIDTH / rect.width;
+      const rawX = (e.clientX - rect.left) * scaleX;
+      const currentRadius = PLANETS[currentDropTier - 1].radius;
+      return Math.max(WALL_LEFT + currentRadius, Math.min(WALL_RIGHT - currentRadius, rawX));
+    }
+
     function setupEventListeners() {
       window.addEventListener('pointerdown', () => audio.unlock(), { once: true });
+      window.addEventListener('touchstart', () => audio.unlock(), { once: true, passive: true });
       window.addEventListener('keydown', () => audio.unlock(), { once: true });
 
+      // Precise Pointer / Touch Drag & Release Control
       canvas.addEventListener('pointerdown', (e) => {
         audio.unlock();
-        updateAimFromPointer(e);
+        if (isPaused || inTitleScreen || isGameOver) return;
+
+        isPointerActive = true;
+        activePointerId = e.pointerId;
+
+        // Capture pointer so dragging outside the canvas still tracks perfectly
+        try {
+          canvas.setPointerCapture(e.pointerId);
+        } catch (err) {}
+
+        const targetX = calculateCanvasPointerX(e);
+        // Instant snap without LERP lag on touch/click
+        aimTargetX = targetX;
+        aimX = targetX;
       });
 
       canvas.addEventListener('pointermove', (e) => {
-        updateAimFromPointer(e);
+        if (isPaused || inTitleScreen || isGameOver) return;
+
+        if (isPointerActive && e.pointerId === activePointerId) {
+          const targetX = calculateCanvasPointerX(e);
+          aimTargetX = targetX;
+          aimX = targetX; // Instant 1:1 finger tracking
+        } else if (!isPointerActive && e.pointerType === 'mouse') {
+          // Smooth desktop mouse hovering
+          aimTargetX = calculateCanvasPointerX(e);
+        }
       });
 
       canvas.addEventListener('pointerup', (e) => {
-        updateAimFromPointer(e);
-        dropMushroom();
+        if (isPointerActive && e.pointerId === activePointerId) {
+          const dropX = calculateCanvasPointerX(e);
+          aimTargetX = dropX;
+          aimX = dropX;
+
+          // Drop immediately at the exact release position
+          dropMushroom(dropX);
+
+          isPointerActive = false;
+          activePointerId = null;
+
+          try {
+            canvas.releasePointerCapture(e.pointerId);
+          } catch (err) {}
+        }
       });
 
-      function updateAimFromPointer(e) {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = CANVAS_WIDTH / rect.width;
-        const rawX = (e.clientX - rect.left) * scaleX;
-        aimTargetX = rawX;
-      }
+      canvas.addEventListener('pointercancel', (e) => {
+        if (isPointerActive && e.pointerId === activePointerId) {
+          isPointerActive = false;
+          activePointerId = null;
+          try {
+            canvas.releasePointerCapture(e.pointerId);
+          } catch (err) {}
+        }
+      });
 
       window.addEventListener('keydown', (e) => {
         audio.unlock();
