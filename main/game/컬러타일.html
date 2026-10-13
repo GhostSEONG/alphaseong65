@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>컬러타일: 클래식 퍼즐 (Color Tiles)</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-main: #f5f0e6;
+      --bg-panel: rgba(255, 255, 255, 0.94);
+      --bg-board: #faf7f0;
+      --border-warm: #e0d5c1;
+      --text-main: #2d241e;
+      --text-sub: #6d5d52;
+      --text-muted: #9c8b7f;
+      --accent-red: #ee5253;
+      --accent-blue: #2e86de;
+      --accent-green: #10ac84;
+      --accent-yellow: #ff9f43;
+      --accent-purple: #9b59b6;
+      --font-family: 'Pretendard', 'Fredoka', 'Quicksand', 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(255, 245, 225, 0.9) 0%, transparent 60%),
+        radial-gradient(circle at 10% 80%, rgba(250, 235, 215, 0.8) 0%, transparent 50%),
+        linear-gradient(180deg, #f7f3ea 0%, #eee6d8 100%);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #app-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 1100px;
+      max-height: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    /* TOP HEADER */
+    #top-bar {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 18px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid var(--border-warm);
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(160, 130, 100, 0.12);
+      margin-bottom: 8px;
+      z-index: 20;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      padding: 3px;
+      background: #fff;
+      border: 1.5px solid var(--border-warm);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .brand-tile {
+      border-radius: 3px;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+    .brand-title span {
+      color: var(--accent-red);
+    }
+
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f7f1e5;
+      padding: 4px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-warm);
+      min-width: 74px;
+    }
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-val {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+    .stat-val.timer-val.warning {
+      color: #ff4757;
+      animation: pulse-timer 0.6s infinite alternate;
+    }
+    @keyframes pulse-timer {
+      from { transform: scale(1); }
+      to { transform: scale(1.15); }
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: #f7f1e5;
+      border: 1px solid var(--border-warm);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .icon-btn:hover {
+      background: #eee5d3;
+      transform: translateY(-2px);
+    }
+    .icon-btn:active {
+      transform: translateY(1px);
+    }
+
+    .lang-btn {
+      width: auto;
+      min-width: 44px;
+      padding: 0 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    /* SUB-BAR (STATUS & CONTROLS) */
+    #sub-bar {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 14px;
+      margin-bottom: 8px;
+      z-index: 15;
+    }
+
+    .sub-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-panel);
+      padding: 5px 14px;
+      border-radius: 14px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      border: 1px solid var(--border-warm);
+      box-shadow: 0 2px 6px rgba(160, 130, 100, 0.08);
+    }
+
+    .tiles-left-chip strong {
+      color: var(--accent-red);
+      font-size: 0.95rem;
+    }
+
+    /* GAME BOARD CANVAS WRAPPER */
+    #board-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-panel);
+      padding: 12px;
+      border-radius: 24px;
+      border: 2px solid var(--border-warm);
+      box-shadow: 0 12px 35px rgba(160, 130, 100, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    #board-canvas {
+      display: block;
+      border-radius: 14px;
+      background: var(--bg-board);
+      box-shadow: inset 0 0 10px rgba(200, 185, 165, 0.3);
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    /* MODALS & OVERLAYS */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(60, 48, 38, 0.45);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: linear-gradient(180deg, #ffffff 0%, #faf6ee 100%);
+      border: 2px solid var(--border-warm);
+      border-radius: 26px;
+      box-shadow: 0 16px 45px rgba(90, 70, 50, 0.22);
+      width: 100%;
+      max-width: 480px;
+      padding: 26px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: var(--text-main);
+    }
+
+    .modal-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+      line-height: 1.35;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-red), #d63031);
+      color: #fff;
+      font-family: var(--font-family);
+      font-size: 1rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(238, 82, 83, 0.35);
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(238, 82, 83, 0.5);
+      filter: brightness(1.06);
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.btn-secondary {
+      background: #eee5d3;
+      border: 1px solid var(--border-warm);
+      color: var(--text-main);
+      box-shadow: none;
+    }
+    .btn.btn-secondary:hover {
+      background: #e4d8c0;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: #eee5d3;
+      border: 1px solid var(--border-warm);
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+      font-size: 1.3rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .modal-close-btn:hover {
+      background: #e4d8c0;
+      color: var(--text-main);
+    }
+
+    /* TITLE SCREEN */
+    #title-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(255, 252, 245, 0.98), rgba(245, 238, 226, 0.99));
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 24px;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    #title-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+
+    .title-logo-icon {
+      width: 72px;
+      height: 72px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 6px;
+      background: #fff;
+      border: 2px solid var(--border-warm);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(160, 130, 100, 0.2);
+      margin-bottom: 8px;
+    }
+    .title-logo-tile {
+      border-radius: 8px;
+    }
+
+    .title-main-text {
+      font-size: 2.7rem;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -1px;
+      margin-top: 4px;
+    }
+    .title-main-text span {
+      color: var(--accent-red);
+    }
+
+    .title-tagline {
+      font-size: 1rem;
+      color: var(--text-sub);
+      margin-top: 6px;
+      margin-bottom: 24px;
+      max-width: 440px;
+      line-height: 1.4;
+    }
+
+    .mode-select-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      background: #eee5d3;
+      border: 2px solid var(--border-warm);
+      border-radius: 14px;
+      color: var(--text-sub);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-btn.active {
+      background: #ffffff;
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      box-shadow: 0 2px 10px rgba(238, 82, 83, 0.2);
+    }
+
+    /* RESULTS SCREEN */
+    .results-hero-val {
+      font-size: 3.4rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      text-shadow: 0 2px 12px rgba(238, 82, 83, 0.25);
+      margin: 4px 0 2px 0;
+      line-height: 1.1;
+    }
+    .results-hero-sub {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .rank-stamp {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      border: 4px solid var(--accent-red);
+      border-radius: 16px;
+      padding: 2px 18px;
+      transform: rotate(-10deg);
+      margin-bottom: 10px;
+      box-shadow: 0 0 15px rgba(238, 82, 83, 0.25);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      margin: 14px 0;
+    }
+
+    .result-stat-box {
+      background: #f7f1e5;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid var(--border-warm);
+    }
+    .result-stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .result-stat-val {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    /* GUIDE BOX */
+    .guide-box {
+      background: #f7f1e5;
+      border-radius: 16px;
+      border: 1px solid var(--border-warm);
+      padding: 14px;
+      margin: 12px 0;
+      text-align: left;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--text-sub);
+    }
+    .guide-box strong {
+      color: var(--accent-red);
+    }
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .step-num {
+      background: var(--accent-red);
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.72rem;
+      flex-shrink: 0;
+    }
+
+    /* SETTINGS MODAL */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-warm);
+      font-size: 0.88rem;
+    }
+    .setting-label {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+    .slider {
+      -webkit-appearance: none;
+      width: 120px;
+      height: 6px;
+      border-radius: 4px;
+      background: var(--border-warm);
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      cursor: pointer;
+    }
+    .toggle-btn {
+      background: #eee5d3;
+      border: 1px solid var(--border-warm);
+      color: var(--text-sub);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .toggle-btn.active {
+      background: var(--accent-red);
+      color: #fff;
+      border-color: var(--accent-red);
+    }
+
+    @media (max-width: 850px) {
+      #board-canvas {
+        max-width: 100%;
+      }
+      .brand-title {
+        font-size: 1.05rem;
+      }
+      .header-stats {
+        gap: 8px;
+      }
+      .stat-chip {
+        padding: 3px 8px;
+        min-width: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- TOP HEADER -->
+    <header id="top-bar">
+      <div class="brand-group" id="btn-brand-title">
+        <div class="brand-icon">
+          <div class="brand-tile" style="background: #ee5253;"></div>
+          <div class="brand-tile" style="background: #2e86de;"></div>
+          <div class="brand-tile" style="background: #10ac84;"></div>
+          <div class="brand-tile" style="background: #ff9f43;"></div>
+        </div>
+        <div class="brand-title" id="txt-brand-title">컬러타일 <span>Color Tiles</span></div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-chip">
+          <span class="stat-label" id="lbl-score">획득 타일</span>
+          <span class="stat-val score-val" id="hud-score">0</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label" id="lbl-timer">시간</span>
+          <span class="stat-val timer-val" id="hud-timer">120</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label" id="lbl-best">최고 기록</span>
+          <span class="stat-val" id="hud-best">0개</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn lang-btn" id="btn-lang-toggle" title="Language">한국어</button>
+        <button class="icon-btn" id="btn-guide" title="How to Play">❓</button>
+        <button class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
+        <button class="icon-btn" id="btn-pause" title="Pause">⏸️</button>
+      </div>
+    </header>
+
+    <!-- SUB-BAR (MODE & REMAINING TILES) -->
+    <div id="sub-bar">
+      <div class="sub-badge mode-badge" id="hud-mode-badge">
+        <span>⏱️</span> <span id="txt-mode-name">120초 클래식 모드</span>
+      </div>
+
+      <div class="sub-badge tiles-left-chip" id="hud-tiles-left">
+        <span id="txt-tiles-left-lbl">남은 타일:</span> <strong id="val-tiles-left">200</strong> / 200
+      </div>
+    </div>
+
+    <!-- MAIN BOARD CONTAINER -->
+    <main id="board-container">
+      <canvas id="board-canvas" width="740" height="560"></canvas>
+    </main>
+
+    <!-- TITLE SCREEN OVERLAY -->
+    <div id="title-screen">
+      <div class="title-logo-icon">
+        <div class="title-logo-tile" style="background: #ee5253;"></div>
+        <div class="title-logo-tile" style="background: #2e86de;"></div>
+        <div class="title-logo-tile" style="background: #10ac84;"></div>
+        <div class="title-logo-tile" style="background: #ff9f43;"></div>
+      </div>
+      <h1 class="title-main-text" id="title-h1">컬러타일 <span>Color Tiles</span></h1>
+      <p class="title-tagline" id="title-tagline">빈칸을 클릭하여 상·하·좌·우 가장 가까운 같은 색 타일들을 획득하세요!</p>
+
+      <div class="mode-select-group">
+        <button class="mode-btn active" id="btn-mode-classic">⏱️ 120초 클래식</button>
+        <button class="mode-btn" id="btn-mode-zen">🧩 젠(무제한) 모드</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" id="btn-start-game">🎮 타일 맞추기 시작</button>
+        <button class="btn btn-secondary" id="btn-open-guide">📖 게임 방법</button>
+        <button class="btn btn-secondary" id="btn-open-settings">⚙️ 환경 설정</button>
+      </div>
+    </div>
+
+    <!-- HOW TO PLAY MODAL -->
+    <div class="modal-overlay" id="guide-modal">
+      <div class="modal-card">
+        <button class="modal-close-btn" id="btn-guide-close">&times;</button>
+        <h2 class="modal-title" id="guide-modal-title">컬러타일 규칙</h2>
+        <p class="modal-subtitle" id="guide-modal-sub">간단하지만 깊은 두뇌 플레이가 필요한 명작 퍼즐!</p>
+
+        <div class="guide-box">
+          <div class="guide-step">
+            <span class="step-num">1</span>
+            <div><strong>빈칸 클릭</strong>: 타일이 없는 빈 공간을 클릭(터치)합니다.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">2</span>
+            <div><strong>상·하·좌·우 4방향 탐색</strong>: 클릭한 지점에서 4방향으로 시선을 뻗었을 때 <strong>가장 먼저 만나는 타일들</strong>을 확인합니다.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">3</span>
+            <div><strong>같은 색상 획득</strong>: 마주친 타일들 중 <strong>같은 색깔의 타일 조합</strong>이 있으면 해당 타일들을 모두 획득하여 제거합니다! (2개, 3개 또는 4개)</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">4</span>
+            <div><strong>페널티 주의</strong>: 일치하는 색 조합이 없는 빈칸을 잘못 클릭하면 <strong>-10초 시간 감점</strong> 페널티가 주어집니다!</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">5</span>
+            <div><strong>길 열기 전략</strong>: 앞쪽 타일을 없애면 뒤쪽에 막혀 있던 타일들의 시야가 트여 새로운 짝을 맞출 수 있습니다. 총 200개의 타일을 모두 없애면 올클리어!</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" id="btn-guide-confirm">알겠습니다!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE MODAL -->
+    <div class="modal-overlay" id="pause-modal">
+      <div class="modal-card">
+        <button class="modal-close-btn" id="btn-pause-close">&times;</button>
+        <h2 class="modal-title" id="pause-modal-title">일시 정지</h2>
+        <p class="modal-subtitle" id="pause-modal-sub">잠시 생각을 가다듬습니다.</p>
+        <div class="modal-actions">
+          <button class="btn" id="btn-pause-resume">▶️ 게임 계속하기</button>
+          <button class="btn btn-secondary" id="btn-pause-restart">🔄 새로 시작</button>
+          <button class="btn btn-secondary" id="btn-pause-title">🏡 메인 화면</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS MODAL -->
+    <div class="modal-overlay" id="results-modal">
+      <div class="modal-card">
+        <div class="rank-stamp" id="results-rank">RANK S</div>
+        <h2 class="modal-title" id="results-modal-title">게임 종료!</h2>
+        <p class="modal-subtitle" id="results-modal-sub">이번 판의 놀라운 타일 획득 기록입니다.</p>
+
+        <div class="results-hero-val" id="results-hero-val">178개</div>
+        <div class="results-hero-sub" id="results-hero-sub">총 200개 중 89% 획득 성공!</div>
+        <div class="stat-label" id="results-best-notice" style="color: var(--accent-red); font-size: 0.85rem; margin-bottom: 12px; display: none;">🌟 역대 최고 기록 달성! 🌟</div>
+
+        <div class="results-grid">
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-cleared">획득 타일</span>
+            <span class="result-stat-val" id="results-val-cleared">178개</span>
+          </div>
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-remain">남은 타일</span>
+            <span class="result-stat-val" id="results-val-remain">22개</span>
+          </div>
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-misses">실수(미스)</span>
+            <span class="result-stat-val" id="results-val-misses">3회</span>
+          </div>
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-best">최고 기록</span>
+            <span class="result-stat-val" id="results-val-best">190개</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" id="btn-results-retry">🎮 다시 플레이</button>
+          <button class="btn btn-secondary" id="btn-results-title">🏡 메인 화면</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="modal-card">
+        <button class="modal-close-btn" id="btn-settings-close">&times;</button>
+        <h2 class="modal-title" id="settings-modal-title">환경 설정</h2>
+        <p class="modal-subtitle" id="settings-modal-sub">사운드, 가이드 및 언어를 설정합니다.</p>
+
+        <div class="setting-row">
+          <span class="setting-label" id="setting-lbl-lang">언어 (Language)</span>
+          <div class="setting-control">
+            <button class="toggle-btn active" id="setting-lang-ko">한국어</button>
+            <button class="toggle-btn" id="setting-lang-en">English</button>
+          </div>
+        </div>
+
+
+
+        <div class="setting-row">
+          <span class="setting-label" id="setting-lbl-music">배경 음악</span>
+          <div class="setting-control">
+            <input type="range" class="slider" id="setting-music-vol" min="0" max="100" value="70">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label" id="setting-lbl-sfx">효과음</span>
+          <div class="setting-control">
+            <input type="range" class="slider" id="setting-sfx-vol" min="0" max="100" value="85">
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 18px;">
+          <button class="btn btn-secondary" id="btn-settings-done">완료</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMPLETE GAME SCRIPT -->
+  <script>
+  (function() {
+    'use strict';
+
+    /* Safe LocalStorage Wrapper */
+    const memoryStore = {};
+    const safeStorage = {
+      getItem(key) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            return window.localStorage.getItem(key);
+          }
+        } catch (e) {}
+        return memoryStore[key] || null;
+      },
+      setItem(key, val) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            window.localStorage.setItem(key, val);
+            return;
+          }
+        } catch (e) {}
+        memoryStore[key] = String(val);
+      }
+    };
+
+    /* Localization */
+    const I18N = {
+      ko: {
+        brand: "컬러타일 <span>Color Tiles</span>",
+        tagline: "빈칸을 클릭하여 상·하·좌·우 가장 가까운 같은 색 타일들을 획득하세요!",
+        score: "획득 타일",
+        timer: "시간",
+        best: "최고 기록",
+        tilesLeft: "남은 타일:",
+        start: "🎮 타일 맞추기 시작",
+        guide: "📖 게임 방법",
+        settings: "⚙️ 환경 설정",
+        modeClassic: "⏱️ 120초 클래식",
+        modeZen: "🧩 젠(무제한) 모드",
+        pauseTitle: "일시 정지",
+        pauseSub: "잠시 생각을 가다듬습니다.",
+        resume: "▶️ 게임 계속하기",
+        restart: "🔄 새로 시작",
+        title: "🏡 메인 화면",
+        resultsTitle: "게임 종료!",
+        resultsSub: "이번 판의 놀라운 타일 획득 기록입니다.",
+        resultsTitle_no_moves: "진행 불가 (더 이상 짝 없음)",
+        resultsSub_no_moves: "보드에 더 이상 맞출 수 있는 타일 조합이 없습니다.",
+        resultsTitle_all_clear: "올 클리어! (ALL CLEAR! 🎉)",
+        resultsSub_all_clear: "200개의 모든 타일을 완벽하게 제거했습니다!",
+        resultsTitle_timeout: "시간 초과!",
+        resultsSub_timeout: "제한시간 120초가 모두 지났습니다.",
+        cleared: "획득 타일",
+        remain: "남은 타일",
+        misses: "실수(미스)",
+        bestRecord: "최고 기록",
+        retry: "🎮 다시 플레이",
+        guideTitle: "컬러타일 규칙",
+        guideSub: "간단하지만 깊은 두뇌 플레이가 필요한 명작 퍼즐!",
+        guideConfirm: "알겠습니다!",
+        settingsTitle: "환경 설정",
+        settingsSub: "사운드, 가이드 및 언어를 설정합니다.",
+        lang: "언어 (Language)",
+        bgm: "배경 음악",
+        sfx: "효과음",
+        done: "완료",
+        classicModeName: "120초 클래식 모드",
+        zenModeName: "젠(무제한) 모드",
+        heroResult: (cnt) => `${cnt}개`,
+        heroPct: (pct) => `총 200개 중 ${pct}% 획득 성공!`,
+        bestNotice: "🌟 역대 최고 기록 달성! 🌟",
+        penalty: "-10초 페널티!",
+        tileUnit: "개"
+      },
+      en: {
+        brand: "Color Tiles <span>Classic</span>",
+        tagline: "Click a blank space to match nearest same-colored tiles in 4 directions!",
+        score: "Tiles Taken",
+        timer: "Time",
+        best: "Best Record",
+        tilesLeft: "Tiles Left:",
+        start: "🎮 Start Game",
+        guide: "📖 How to Play",
+        settings: "⚙️ Settings",
+        modeClassic: "⏱️ 120s Classic",
+        modeZen: "🧩 Zen Mode",
+        pauseTitle: "Game Paused",
+        pauseSub: "Take your time and plan ahead.",
+        resume: "▶️ Resume Game",
+        restart: "🔄 Restart",
+        title: "🏡 Title Screen",
+        resultsTitle: "Game Over!",
+        resultsSub: "Here is your tile clearing performance.",
+        resultsTitle_no_moves: "No More Moves Left!",
+        resultsSub_no_moves: "No matching tile pairs remain on the board.",
+        resultsTitle_all_clear: "ALL CLEAR! 🎉",
+        resultsSub_all_clear: "You cleared all 200 tiles on the board!",
+        resultsTitle_timeout: "Time's Up!",
+        resultsSub_timeout: "The 120-second timer has expired.",
+        cleared: "Tiles Cleared",
+        remain: "Remaining",
+        misses: "Misses",
+        bestRecord: "Best Record",
+        retry: "🎮 Play Again",
+        guideTitle: "Color Tiles Rules",
+        guideSub: "Classic addictive puzzle from GameSaien!",
+        guideConfirm: "Got It!",
+        settingsTitle: "Settings",
+        settingsSub: "Tune audio, guides, and language.",
+        lang: "Language",
+        bgm: "Background Music",
+        sfx: "Sound Effects",
+        done: "Done",
+        classicModeName: "120s Classic Mode",
+        zenModeName: "Zen Mode",
+        heroResult: (cnt) => `${cnt} Tiles`,
+        heroPct: (pct) => `${pct}% Cleared out of 200!`,
+        bestNotice: "🌟 NEW ALL-TIME RECORD! 🌟",
+        penalty: "-10s Penalty!",
+        tileUnit: " Tiles"
+      }
+    };
+
+    let currentLang = safeStorage.getItem('colortile_lang') || 'ko';
+    function t(k, ...args) {
+      const dict = I18N[currentLang] || I18N.ko;
+      const v = dict[k];
+      if (typeof v === 'function') return v(...args);
+      return v || k;
+    }
+
+    /* Web Audio Synthesizer */
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.musicGain = null;
+        this.sfxGain = null;
+        this.musicVol = 0.7;
+        this.sfxVol = 0.85;
+        this.musicStep = 0;
+        this.musicTimer = null;
+        this.isMusicPlaying = false;
+      }
+
+      init() {
+        if (this.ctx) return;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          this.ctx = new AC();
+          this.masterGain = this.ctx.createGain();
+          this.musicGain = this.ctx.createGain();
+          this.sfxGain = this.ctx.createGain();
+
+          this.updateVolumes();
+
+          this.musicGain.connect(this.masterGain);
+          this.sfxGain.connect(this.masterGain);
+          this.masterGain.connect(this.ctx.destination);
+
+          this.startMusic();
+        } catch (e) {
+          console.warn("Web Audio init failed:", e);
+        }
+      }
+
+      unlock() {
+        if (!this.ctx) this.init();
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      updateVolumes() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        this.masterGain.gain.setValueAtTime(1.0, now);
+        this.musicGain.gain.setValueAtTime(this.musicVol * 0.35, now);
+        this.sfxGain.gain.setValueAtTime(this.sfxVol, now);
+      }
+
+      startMusic() {
+        if (this.isMusicPlaying || !this.ctx) return;
+        this.isMusicPlaying = true;
+        this.scheduleMusic();
+      }
+
+      scheduleMusic() {
+        if (!this.isMusicPlaying || !this.ctx) return;
+
+        // Soothing, upbeat puzzle melody in C Major / Pentatonic (C4, D4, E4, G4, A4, C5)
+        const NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+        const BASS = [130.81, 164.81, 174.61, 196.00]; // C, E, F, G
+
+        const bar = Math.floor(this.musicStep / 8) % BASS.length;
+        const sub = this.musicStep % 8;
+
+        if (sub === 0) {
+          this.playBassNote(BASS[bar]);
+        }
+
+        const melodyIdx = (sub * 2 + bar) % NOTES.length;
+        if (sub % 2 === 0 || Math.random() > 0.25) {
+          this.playMarimba(NOTES[melodyIdx], 0.2);
+        }
+
+        this.musicStep++;
+        this.musicTimer = setTimeout(() => this.scheduleMusic(), 230); // ~130 BPM
+      }
+
+      playMarimba(freq, duration) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.musicGain);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.05);
+      }
+
+      playBassNote(freq) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+
+        osc.connect(gain);
+        gain.connect(this.musicGain);
+
+        osc.start(now);
+        osc.stop(now + 1.15);
+      }
+
+      playTileMatch(count = 2) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const baseFreq = count >= 4 ? 659.25 : (count === 3 ? 587.33 : 523.25);
+
+        const osc = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(baseFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.12);
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(baseFreq * 2, now);
+        osc2.frequency.exponentialRampToValueAtTime(baseFreq * 2.5, now + 0.16);
+
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+        osc.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc2.start(now);
+        osc.stop(now + 0.32);
+        osc2.stop(now + 0.32);
+      }
+
+      playMissBuzz() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.18);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc.stop(now + 0.22);
+      }
+
+      playFanfare() {
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          setTimeout(() => {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+
+            osc.start(now);
+            osc.stop(now + 0.55);
+          }, i * 90);
+        });
+      }
+
+      playClick() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(850, now);
+        osc.frequency.exponentialRampToValueAtTime(450, now + 0.04);
+
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+    }
+
+    const audio = new AudioEngine();
+
+    /* Board & Color Configuration */
+    const COLS = 20;
+    const ROWS = 15;
+    const TOTAL_CELLS = COLS * ROWS; // 300
+    const TOTAL_TILES = 200; // Classic GameSaien standard (200 tiles, 100 blanks)
+
+    // 5 Deep, Vivid, High-Contrast Colors (40 tiles each)
+    const COLORS = [
+      { id: 'red', hex: '#D63031', dark: '#8B1515', border: '#6B0E0E' },       // Deep Crimson Red
+      { id: 'blue', hex: '#0984E3', dark: '#0652DD', border: '#04368E' },      // Electric Royal Blue
+      { id: 'green', hex: '#009432', dark: '#006221', border: '#004417' },     // Rich Forest Green
+      { id: 'yellow', hex: '#F39C12', dark: '#B76500', border: '#7D4400' },    // Warm Golden Amber
+      { id: 'purple', hex: '#6C5CE7', dark: '#4834D4', border: '#322394' }     // Deep Royal Violet
+    ];
+
+    const CELL_SIZE = 36;
+    const TILE_PAD = 3;
+    const TILE_SIZE = CELL_SIZE - TILE_PAD * 2; // 30px
+    const BOARD_PAD = 10;
+
+    let canvas, ctx;
+    let grid = []; // 2D array [row][col] -> null or color object
+
+    let gameMode = 'classic'; // 'classic' (120s with -10s penalty) or 'zen'
+    let timeLeft = 120;
+    let gameTimer = null;
+    let isPlaying = false;
+    let isPaused = false;
+    let inTitle = true;
+
+    let clearedTiles = 0;
+    let missesCount = 0;
+    let bestClassic = parseInt(safeStorage.getItem('colortile_best_classic') || '0', 10);
+    let bestZen = parseInt(safeStorage.getItem('colortile_best_zen') || '0', 10);
+
+    
+    // Visual animations
+    let laserBeams = []; // Array of active shooting beam animations
+    let particles = [];
+    let floatingTexts = [];
+    let screenShake = 0;
+
+    class LaserBeam {
+      constructor(fromX, fromY, toX, toY, colorHex) {
+        this.fromX = fromX;
+        this.fromY = fromY;
+        this.toX = toX;
+        this.toY = toY;
+        this.color = colorHex;
+        this.life = 0.28;
+        this.maxLife = 0.28;
+      }
+      update(dt) {
+        this.life -= dt;
+      }
+      draw(c) {
+        const alpha = Math.max(0, this.life / this.maxLife);
+        c.save();
+        c.strokeStyle = this.color;
+        c.lineWidth = 4 * alpha;
+        c.shadowColor = this.color;
+        c.shadowBlur = 12;
+        c.beginPath();
+        c.moveTo(this.fromX, this.fromY);
+        c.lineTo(this.toX, this.toY);
+        c.stroke();
+        c.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color, size = 4) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = size;
+        this.vx = (Math.random() - 0.5) * 180;
+        this.vy = (Math.random() - 0.5) * 180;
+        this.alpha = 1.0;
+        this.life = 0.35 + Math.random() * 0.3;
+        this.maxLife = this.life;
+      }
+      update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.life -= dt;
+        this.alpha = Math.max(0, this.life / this.maxLife);
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.fillStyle = this.color;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size * this.alpha, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    class FloatingText {
+      constructor(text, x, y, color = "#ee5253") {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.alpha = 1.0;
+        this.vy = -55;
+        this.life = 0.85;
+      }
+      update(dt) {
+        this.y += this.vy * dt;
+        this.life -= dt;
+        this.alpha = Math.max(0, this.life / 0.85);
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.font = "900 18px " + getComputedStyle(document.body).fontFamily;
+        c.fillStyle = this.color;
+        c.shadowColor = "rgba(0,0,0,0.25)";
+        c.shadowBlur = 4;
+        c.textAlign = "center";
+        c.fillText(this.text, this.x, this.y);
+        c.restore();
+      }
+    }
+
+    /* Initialize Board with Exactly 200 Colored Tiles & 100 Blanks */
+    function initBoard() {
+      grid = [];
+      for (let r = 0; r < ROWS; r++) {
+        grid[r] = new Array(COLS).fill(null);
+      }
+
+      // Generate 200 tiles: 5 colors x 40 tiles
+      const tileDeck = [];
+      COLORS.forEach(cObj => {
+        for (let i = 0; i < 40; i++) {
+          tileDeck.push(cObj);
+        }
+      });
+
+      // Random 200 distinct cell positions out of 300
+      const allPos = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          allPos.push({ r, c });
+        }
+      }
+
+      // Shuffle positions
+      for (let i = allPos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allPos[i], allPos[j]] = [allPos[j], allPos[i]];
+      }
+
+      // Place 200 tiles
+      for (let i = 0; i < TOTAL_TILES; i++) {
+        const pos = allPos[i];
+        grid[pos.r][pos.c] = tileDeck[i];
+      }
+
+      updateTilesCount();
+    }
+
+    function updateTilesCount() {
+      let remain = 0;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (grid[r][c] !== null) remain++;
+        }
+      }
+      document.getElementById('val-tiles-left').textContent = remain;
+      return remain;
+    }
+
+    /* Core Raycast Solver: Find 4 nearest tiles from a blank space */
+    function scanDirections(col, row) {
+      const nearest = {
+        up: null,
+        down: null,
+        left: null,
+        right: null
+      };
+
+      // UP
+      for (let r = row - 1; r >= 0; r--) {
+        if (grid[r][col] !== null) {
+          nearest.up = { col, row: r, color: grid[r][col] };
+          break;
+        }
+      }
+
+      // DOWN
+      for (let r = row + 1; r < ROWS; r++) {
+        if (grid[r][col] !== null) {
+          nearest.down = { col, row: r, color: grid[r][col] };
+          break;
+        }
+      }
+
+      // LEFT
+      for (let c = col - 1; c >= 0; c--) {
+        if (grid[row][c] !== null) {
+          nearest.left = { col: c, row, color: grid[row][c] };
+          break;
+        }
+      }
+
+      // RIGHT
+      for (let c = col + 1; c < COLS; c++) {
+        if (grid[row][c] !== null) {
+          nearest.right = { col: c, row, color: grid[row][c] };
+          break;
+        }
+      }
+
+      const activeFound = Object.values(nearest).filter(n => n !== null);
+      const colorCounts = {};
+      activeFound.forEach(item => {
+        const id = item.color.id;
+        colorCounts[id] = (colorCounts[id] || 0) + 1;
+      });
+
+      const matchingIds = Object.keys(colorCounts).filter(id => colorCounts[id] >= 2);
+      const matchedTiles = activeFound.filter(item => matchingIds.includes(item.color.id));
+
+      return { nearest, matchedTiles };
+    }
+
+    /* Check if at least one valid move exists on the board */
+    function hasAnyValidMove() {
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (grid[r][c] === null) {
+            const { matchedTiles } = scanDirections(c, r);
+            if (matchedTiles.length >= 2) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
+
+    /* Handle Click Move */
+    function handleCellClick(col, row) {
+      if (!isPlaying || isPaused || inTitle) return;
+
+      // Must click on an EMPTY space
+      if (grid[row][col] !== null) {
+        return;
+      }
+
+      audio.unlock();
+      const clickPx = getCellCenter(col, row);
+      const { matchedTiles } = scanDirections(col, row);
+
+      if (matchedTiles.length > 0) {
+        // SUCCESS: Remove matching tiles!
+        clearedTiles += matchedTiles.length;
+        document.getElementById('hud-score').textContent = clearedTiles;
+
+        audio.playTileMatch(matchedTiles.length);
+
+        matchedTiles.forEach(tile => {
+          const tilePx = getCellCenter(tile.col, tile.row);
+          // Add laser beam from click to tile
+          laserBeams.push(new LaserBeam(clickPx.x, clickPx.y, tilePx.x, tilePx.y, tile.color.hex));
+
+          // Spawn particle explosion
+          for (let p = 0; p < 12; p++) {
+            particles.push(new Particle(tilePx.x, tilePx.y, tile.color.hex, 3 + Math.random() * 3));
+          }
+
+          // Clear from board
+          grid[tile.row][tile.col] = null;
+        });
+
+        // Float score addition
+        floatingTexts.push(new FloatingText(`+${matchedTiles.length}`, clickPx.x, clickPx.y - 12, "#10ac84"));
+
+        const remain = updateTilesCount();
+        if (remain === 0) {
+          setTimeout(() => endGame('all_clear'), 300);
+        } else {
+          // Check if any valid move remains
+          if (!hasAnyValidMove()) {
+            setTimeout(() => endGame('no_moves'), 600);
+          }
+        }
+      } else {
+        // MISS / PENALTY!
+        missesCount++;
+        audio.playMissBuzz();
+        screenShake = 6;
+
+        if (gameMode === 'classic') {
+          timeLeft = Math.max(0, timeLeft - 10);
+          document.getElementById('hud-timer').textContent = timeLeft;
+          floatingTexts.push(new FloatingText(t("penalty"), clickPx.x, clickPx.y - 14, "#ee5253"));
+
+          if (timeLeft <= 0) {
+            endGame('timeout');
+          }
+        } else {
+          floatingTexts.push(new FloatingText("MISS!", clickPx.x, clickPx.y - 14, "#ee5253"));
+        }
+      }
+    }
+
+    function getCellCenter(col, row) {
+      return {
+        x: BOARD_PAD + col * CELL_SIZE + CELL_SIZE / 2,
+        y: BOARD_PAD + row * CELL_SIZE + CELL_SIZE / 2
+      };
+    }
+
+    /* Start / End Game */
+    function startGame(mode = 'classic') {
+      gameMode = mode;
+      clearedTiles = 0;
+      missesCount = 0;
+      laserBeams = [];
+      particles = [];
+      floatingTexts = [];
+      screenShake = 0;
+
+      document.getElementById('hud-score').textContent = "0";
+      document.getElementById('txt-mode-name').textContent = gameMode === 'classic' ? t("classicModeName") : t("zenModeName");
+
+      const bestVal = gameMode === 'classic' ? bestClassic : bestZen;
+      document.getElementById('hud-best').textContent = `${bestVal}${t("tileUnit")}`;
+
+      initBoard();
+
+      if (gameMode === 'classic') {
+        timeLeft = 120;
+        document.getElementById('lbl-timer').textContent = t("timer");
+        document.getElementById('hud-timer').textContent = timeLeft;
+        document.getElementById('hud-timer').classList.remove('warning');
+      } else {
+        timeLeft = 0;
+        document.getElementById('lbl-timer').textContent = "경과";
+        document.getElementById('hud-timer').textContent = "0:00";
+        document.getElementById('hud-timer').classList.remove('warning');
+      }
+
+      if (gameTimer) clearInterval(gameTimer);
+      gameTimer = setInterval(onTimerTick, 1000);
+
+      isPlaying = true;
+      isPaused = false;
+      inTitle = false;
+      document.getElementById('title-screen').classList.add('hidden');
+      closeAllModals();
+    }
+
+    function onTimerTick() {
+      if (!isPlaying || isPaused || inTitle) return;
+
+      if (gameMode === 'classic') {
+        timeLeft--;
+        const timerEl = document.getElementById('hud-timer');
+        timerEl.textContent = timeLeft;
+
+        if (timeLeft <= 10) {
+          timerEl.classList.add('warning');
+          audio.playClick();
+        }
+
+        if (timeLeft <= 0) {
+          endGame('timeout');
+        }
+      } else {
+        timeLeft++;
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        document.getElementById('hud-timer').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+    }
+
+    function endGame(reason = 'timeout') {
+      isPlaying = false;
+      if (gameTimer) clearInterval(gameTimer);
+
+      audio.playFanfare();
+
+      const remain = updateTilesCount();
+      const clearPct = Math.round((clearedTiles / TOTAL_TILES) * 100);
+
+      // Rank evaluation
+      let rank = 'D';
+      if (reason === 'all_clear' || clearedTiles === TOTAL_TILES) rank = 'S+';
+      else if (clearedTiles >= 180) rank = 'S';
+      else if (clearedTiles >= 150) rank = 'A';
+      else if (clearedTiles >= 100) rank = 'B';
+      else if (clearedTiles >= 60) rank = 'C';
+
+      const resultsModal = document.getElementById('results-modal');
+      document.getElementById('results-rank').textContent = `RANK ${rank}`;
+
+      // Set Reason-specific Titles
+      if (reason === 'no_moves') {
+        document.getElementById('results-modal-title').textContent = t("resultsTitle_no_moves");
+        document.getElementById('results-modal-sub').textContent = t("resultsSub_no_moves");
+      } else if (reason === 'all_clear') {
+        document.getElementById('results-modal-title').textContent = t("resultsTitle_all_clear");
+        document.getElementById('results-modal-sub').textContent = t("resultsSub_all_clear");
+      } else {
+        document.getElementById('results-modal-title').textContent = t("resultsTitle_timeout");
+        document.getElementById('results-modal-sub').textContent = t("resultsSub_timeout");
+      }
+
+      document.getElementById('results-hero-val').textContent = t("heroResult", clearedTiles);
+      document.getElementById('results-hero-sub').textContent = t("heroPct", clearPct);
+
+      document.getElementById('results-val-cleared').textContent = `${clearedTiles}개 (${clearPct}%)`;
+      document.getElementById('results-val-remain').textContent = `${remain}개`;
+      document.getElementById('results-val-misses').textContent = `${missesCount}회`;
+
+      // Best record check
+      let isNewRecord = false;
+      if (gameMode === 'classic') {
+        if (clearedTiles > bestClassic) {
+          bestClassic = clearedTiles;
+          safeStorage.setItem('colortile_best_classic', bestClassic);
+          isNewRecord = true;
+        }
+        document.getElementById('results-val-best').textContent = `${bestClassic}개`;
+      } else {
+        if (clearedTiles > bestZen) {
+          bestZen = clearedTiles;
+          safeStorage.setItem('colortile_best_zen', bestZen);
+          isNewRecord = true;
+        }
+        document.getElementById('results-val-best').textContent = `${bestZen}개`;
+      }
+
+      document.getElementById('results-best-notice').style.display = isNewRecord ? 'block' : 'none';
+      resultsModal.classList.add('active');
+    }
+
+    /* Canvas Render Engine */
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      if (screenShake > 0) {
+        ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+        screenShake = Math.max(0, screenShake - 0.5);
+      }
+
+      // 1. Clear & High-Contrast Grid Board
+      ctx.fillStyle = "#FFFDF9";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "rgba(215, 200, 185, 0.6)";
+      ctx.lineWidth = 1;
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const x = BOARD_PAD + c * CELL_SIZE;
+          const y = BOARD_PAD + r * CELL_SIZE;
+          ctx.strokeRect(x, y, CELL_SIZE, CELL_SIZE);
+
+          // Subtle inset dot for empty spaces
+          if (grid[r][c] === null) {
+            ctx.fillStyle = "rgba(190, 170, 150, 0.4)";
+            ctx.beginPath();
+            ctx.arc(x + CELL_SIZE / 2, y + CELL_SIZE / 2, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+// 2. Render Colored Tiles
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const tile = grid[r][c];
+          if (tile === null) continue;
+
+          drawTile(ctx, c, r, tile);
+        }
+      }
+
+      // 4. Laser Beams
+      laserBeams.forEach(b => b.draw(ctx));
+
+      // 5. Particles & Floating Texts
+      particles.forEach(p => p.draw(ctx));
+      floatingTexts.forEach(ft => ft.draw(ctx));
+
+      ctx.restore();
+    }
+
+    function drawTile(c, col, row, tile) {
+      c.save();
+      const x = BOARD_PAD + col * CELL_SIZE + TILE_PAD;
+      const y = BOARD_PAD + row * CELL_SIZE + TILE_PAD;
+
+      // Crisp contrast drop shadow
+      c.fillStyle = "rgba(40, 30, 20, 0.22)";
+      c.beginPath();
+      c.roundRect(x, y + 2.5, TILE_SIZE, TILE_SIZE, 6);
+      c.fill();
+
+      // 3D Bevel Gradient Tile
+      const grad = c.createLinearGradient(x, y, x, y + TILE_SIZE);
+      grad.addColorStop(0, tile.hex);
+      grad.addColorStop(0.55, tile.hex);
+      grad.addColorStop(1, tile.dark);
+
+      c.fillStyle = grad;
+      c.beginPath();
+      c.roundRect(x, y, TILE_SIZE, TILE_SIZE, 6);
+      c.fill();
+
+      // Sharp contrasting border for maximum legibility
+      c.strokeStyle = tile.border;
+      c.lineWidth = 1.6;
+      c.stroke();
+
+      // Top Specular Highlight
+      c.fillStyle = "rgba(255, 255, 255, 0.42)";
+      c.beginPath();
+      c.roundRect(x + 2, y + 2, TILE_SIZE - 4, (TILE_SIZE - 4) * 0.4, [4, 4, 1, 1]);
+      c.fill();
+
+      c.restore();
+    }
+
+    /* Main Loop */
+    let lastTime = performance.now();
+
+    function loop(time) {
+      requestAnimationFrame(loop);
+      const dt = Math.min(0.05, (time - lastTime) / 1000);
+      lastTime = time;
+
+      // Update Beams
+      for (let i = laserBeams.length - 1; i >= 0; i--) {
+        laserBeams[i].update(dt);
+        if (laserBeams[i].life <= 0) laserBeams.splice(i, 1);
+      }
+
+      // Update Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update(dt);
+        if (particles[i].life <= 0) particles.splice(i, 1);
+      }
+
+      // Update Floating Texts
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        floatingTexts[i].update(dt);
+        if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
+      }
+
+      render();
+    }
+
+    /* Event Listeners */
+    function setupInteractions() {
+      window.addEventListener('pointerdown', () => audio.unlock(), { once: true });
+      window.addEventListener('keydown', () => audio.unlock(), { once: true });
+
+      function getCellFromPointer(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (clientX - rect.left) * scaleX - BOARD_PAD;
+        const y = (clientY - rect.top) * scaleY - BOARD_PAD;
+
+        const col = Math.floor(x / CELL_SIZE);
+        const row = Math.floor(y / CELL_SIZE);
+        if (col >= 0 && col < COLS && row >= 0 && row < ROWS) {
+          return { col, row };
+        }
+        return null;
+      }
+
+
+
+      canvas.addEventListener('pointerdown', (e) => {
+        const cell = getCellFromPointer(e.clientX, e.clientY);
+        if (cell) {
+          handleCellClick(cell.col, cell.row);
+        }
+      });
+
+      // Header and Modal Buttons
+      document.getElementById('btn-lang-toggle').addEventListener('click', () => {
+        audio.playClick();
+        setLanguage(currentLang === 'ko' ? 'en' : 'ko');
+      });
+
+      document.getElementById('btn-brand-title').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('title-screen').classList.remove('hidden');
+        inTitle = true;
+      });
+
+      document.getElementById('btn-start-game').addEventListener('click', () => {
+        audio.unlock();
+        audio.playClick();
+        startGame(gameMode);
+      });
+
+      document.getElementById('btn-mode-classic').addEventListener('click', () => {
+        audio.playClick();
+        gameMode = 'classic';
+        document.getElementById('btn-mode-classic').classList.add('active');
+        document.getElementById('btn-mode-zen').classList.remove('active');
+      });
+
+      document.getElementById('btn-mode-zen').addEventListener('click', () => {
+        audio.playClick();
+        gameMode = 'zen';
+        document.getElementById('btn-mode-zen').classList.add('active');
+        document.getElementById('btn-mode-classic').classList.remove('active');
+      });
+
+      document.getElementById('btn-guide').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.add('active');
+      });
+      document.getElementById('btn-open-guide').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.add('active');
+      });
+      document.getElementById('btn-guide-close').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.remove('active');
+      });
+      document.getElementById('btn-guide-confirm').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.remove('active');
+      });
+
+      document.getElementById('btn-settings').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.add('active');
+      });
+      document.getElementById('btn-open-settings').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.add('active');
+      });
+      document.getElementById('btn-settings-close').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.remove('active');
+      });
+      document.getElementById('btn-settings-done').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.remove('active');
+      });
+
+      document.getElementById('setting-lang-ko').addEventListener('click', () => {
+        audio.playClick();
+        setLanguage('ko');
+      });
+      document.getElementById('setting-lang-en').addEventListener('click', () => {
+        audio.playClick();
+        setLanguage('en');
+      });
+
+
+
+      // Volume Sliders
+      const musicSlider = document.getElementById('setting-music-vol');
+      const sfxSlider = document.getElementById('setting-sfx-vol');
+      musicSlider.addEventListener('input', (e) => {
+        audio.musicVol = parseInt(e.target.value, 10) / 100;
+        audio.updateVolumes();
+      });
+      sfxSlider.addEventListener('input', (e) => {
+        audio.sfxVol = parseInt(e.target.value, 10) / 100;
+        audio.updateVolumes();
+      });
+
+      // Pause Modal
+      document.getElementById('btn-pause').addEventListener('click', () => {
+        if (!isPlaying || inTitle) return;
+        isPaused = true;
+        audio.playClick();
+        document.getElementById('pause-modal').classList.add('active');
+      });
+      document.getElementById('btn-pause-close').addEventListener('click', () => {
+        isPaused = false;
+        audio.playClick();
+        document.getElementById('pause-modal').classList.remove('active');
+      });
+      document.getElementById('btn-pause-resume').addEventListener('click', () => {
+        isPaused = false;
+        audio.playClick();
+        document.getElementById('pause-modal').classList.remove('active');
+      });
+      document.getElementById('btn-pause-restart').addEventListener('click', () => {
+        audio.playClick();
+        startGame(gameMode);
+      });
+      document.getElementById('btn-pause-title').addEventListener('click', () => {
+        audio.playClick();
+        closeAllModals();
+        document.getElementById('title-screen').classList.remove('hidden');
+        inTitle = true;
+      });
+
+      // Results Modal
+      document.getElementById('btn-results-retry').addEventListener('click', () => {
+        audio.playClick();
+        startGame(gameMode);
+      });
+      document.getElementById('btn-results-title').addEventListener('click', () => {
+        audio.playClick();
+        closeAllModals();
+        document.getElementById('title-screen').classList.remove('hidden');
+        inTitle = true;
+      });
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang === 'en' ? 'en' : 'ko';
+      safeStorage.setItem('colortile_lang', currentLang);
+
+      document.getElementById('btn-lang-toggle').textContent = currentLang === 'ko' ? '한국어' : 'English';
+      document.getElementById('txt-brand-title').innerHTML = t("brand");
+      document.getElementById('title-h1').innerHTML = t("brand");
+      document.getElementById('title-tagline').textContent = t("tagline");
+
+      document.getElementById('lbl-score').textContent = t("score");
+      document.getElementById('lbl-timer').textContent = gameMode === 'classic' ? t("timer") : "경과";
+      document.getElementById('lbl-best').textContent = t("best");
+
+      const bestVal = gameMode === 'classic' ? bestClassic : bestZen;
+      document.getElementById('hud-best').textContent = `${bestVal}${t("tileUnit")}`;
+
+      document.getElementById('txt-mode-name').textContent = gameMode === 'classic' ? t("classicModeName") : t("zenModeName");
+      document.getElementById('txt-tiles-left-lbl').textContent = t("tilesLeft");
+
+      document.getElementById('btn-mode-classic').textContent = t("modeClassic");
+      document.getElementById('btn-mode-zen').textContent = t("modeZen");
+      document.getElementById('btn-start-game').textContent = t("start");
+      document.getElementById('btn-open-guide').textContent = t("guide");
+      document.getElementById('btn-open-settings').textContent = t("settings");
+
+      document.getElementById('pause-modal-title').textContent = t("pauseTitle");
+      document.getElementById('pause-modal-sub').textContent = t("pauseSub");
+      document.getElementById('btn-pause-resume').textContent = t("resume");
+      document.getElementById('btn-pause-restart').textContent = t("restart");
+      document.getElementById('btn-pause-title').textContent = t("title");
+
+      document.getElementById('results-modal-title').textContent = t("resultsTitle");
+      document.getElementById('results-modal-sub').textContent = t("resultsSub");
+      document.getElementById('results-lbl-cleared').textContent = t("cleared");
+      document.getElementById('results-lbl-remain').textContent = t("remain");
+      document.getElementById('results-lbl-misses').textContent = t("misses");
+      document.getElementById('results-lbl-best').textContent = t("bestRecord");
+      document.getElementById('btn-results-retry').textContent = t("retry");
+      document.getElementById('btn-results-title').textContent = t("title");
+
+      document.getElementById('guide-modal-title').textContent = t("guideTitle");
+      document.getElementById('guide-modal-sub').textContent = t("guideSub");
+      document.getElementById('btn-guide-confirm').textContent = t("guideConfirm");
+
+      document.getElementById('settings-modal-title').textContent = t("settingsTitle");
+      document.getElementById('settings-modal-sub').textContent = t("settingsSub");
+      document.getElementById('setting-lbl-lang').textContent = t("lang");
+      document.getElementById('setting-lbl-music').textContent = t("bgm");
+      document.getElementById('setting-lbl-sfx').textContent = t("sfx");
+      document.getElementById('btn-settings-done').textContent = t("done");
+
+      document.getElementById('setting-lang-ko').className = "toggle-btn " + (currentLang === 'ko' ? 'active' : '');
+      document.getElementById('setting-lang-en').className = "toggle-btn " + (currentLang === 'en' ? 'active' : '');
+    }
+
+    // Expose programmatic hooks for testing
+    window.ColorTileGame = {
+      startGame,
+      endGame,
+      handleCellClick,
+      scanDirections,
+      setLanguage,
+      hasAnyValidMove,
+      getScore: () => clearedTiles,
+      getGrid: () => grid,
+      getTilesRemaining: updateTilesCount
+    };
+
+    /* Init */
+    window.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('board-canvas');
+      ctx = canvas.getContext('2d');
+
+      setupInteractions();
+      setLanguage(currentLang);
+      initBoard();
+
+      requestAnimationFrame(loop);
+    });
+
+  })();
+  </script>
+</body>
+</html>
