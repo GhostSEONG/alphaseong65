@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>사과게임: 합 10 머지 퍼즐 (Apple Game - Make 10)</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-ivory: #FAF7EE;
+      --bg-ivory-warm: #F4EEDF;
+      --bg-panel: rgba(255, 255, 255, 0.93);
+      --bg-card: rgba(255, 255, 255, 0.96);
+      --bg-chip: rgba(246, 240, 230, 0.88);
+      --border-warm: #E2D7C5;
+      --border-card: rgba(215, 200, 180, 0.85);
+      --accent-red: #E74C3C;
+      --accent-red-hover: #D63031;
+      --accent-gold: #D35400;
+      --accent-leaf: #27AE60;
+      --text-main: #2C241E;
+      --text-sub: #6E5E52;
+      --text-muted: #958476;
+      --font-family: 'Pretendard', 'Fredoka', 'Quicksand', 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-ivory);
+      background-image: 
+        radial-gradient(circle at 50% 8%, rgba(255, 238, 215, 0.85) 0%, transparent 60%),
+        radial-gradient(circle at 10% 75%, rgba(255, 245, 230, 0.9) 0%, transparent 50%),
+        radial-gradient(circle at 90% 85%, rgba(250, 235, 220, 0.85) 0%, transparent 50%),
+        linear-gradient(180deg, #FAF7EE 0%, #F5EFE0 50%, #ECE3D0 100%);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #app-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 1100px;
+      max-height: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    /* TOP HEADER */
+    #top-bar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 18px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid var(--border-warm);
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(180, 150, 120, 0.15), 0 2px 6px rgba(0, 0, 0, 0.03);
+      margin-bottom: 8px;
+      z-index: 20;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      font-size: 26px;
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+    .brand-title span {
+      color: var(--accent-red);
+    }
+
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-chip);
+      padding: 4px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-warm);
+      min-width: 72px;
+    }
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-val {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--accent-gold);
+    }
+    .stat-val.harvest-val {
+      color: var(--accent-red);
+    }
+    .stat-val.timer-val.warning {
+      color: #ff4757;
+      animation: pulse-timer 0.6s infinite alternate;
+    }
+    @keyframes pulse-timer {
+      from { transform: scale(1); }
+      to { transform: scale(1.18); }
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--bg-chip);
+      border: 1px solid var(--border-warm);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .icon-btn:hover {
+      background: #EFE6D5;
+      border-color: #D5C5B0;
+      transform: translateY(-2px);
+    }
+    .icon-btn:active {
+      transform: translateY(1px);
+    }
+
+    .lang-btn {
+      width: auto;
+      min-width: 44px;
+      padding: 0 10px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    /* SUB-BAR (STATUS & REMAINING APPLES) */
+    #sub-bar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 14px;
+      margin-bottom: 8px;
+      z-index: 15;
+    }
+
+    .mode-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-panel);
+      padding: 5px 14px;
+      border-radius: 14px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      border: 1px solid var(--border-warm);
+      box-shadow: 0 2px 8px rgba(180, 150, 120, 0.08);
+    }
+
+    .apples-left-chip {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      background: var(--bg-panel);
+      padding: 5px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-warm);
+      box-shadow: 0 2px 8px rgba(180, 150, 120, 0.08);
+    }
+    .apples-left-chip strong {
+      color: var(--accent-red);
+      font-size: 0.95rem;
+    }
+
+    /* GAME BOARD CANVAS WRAPPER */
+    #board-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-panel);
+      padding: 12px;
+      border-radius: 24px;
+      border: 2px solid var(--border-warm);
+      box-shadow: 0 12px 36px rgba(160, 130, 100, 0.15), 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    #board-canvas {
+      display: block;
+      border-radius: 16px;
+      background: #FFFDF8;
+      box-shadow: inset 0 0 12px rgba(210, 195, 175, 0.25);
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* FLOATING SUM TAG (FOLLOWS MOUSE/TOUCH) */
+    #sum-tag {
+      position: absolute;
+      display: none;
+      pointer-events: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: 900;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+      z-index: 30;
+      transform: translate(-50%, -130%);
+      transition: background 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+    #sum-tag.sum-less {
+      background: rgba(41, 128, 185, 0.95);
+      border: 2px solid #5dade2;
+      color: #ffffff;
+    }
+    #sum-tag.sum-match {
+      background: rgba(39, 174, 96, 0.98);
+      border: 2px solid #f1c40f;
+      color: #fff;
+      animation: pulse-match 0.4s infinite alternate;
+      box-shadow: 0 0 20px rgba(241, 196, 15, 0.7);
+    }
+    #sum-tag.sum-over {
+      background: rgba(192, 57, 43, 0.95);
+      border: 2px solid #e74c3c;
+      color: #fff;
+    }
+    @keyframes pulse-match {
+      from { transform: translate(-50%, -130%) scale(0.96); }
+      to { transform: translate(-50%, -130%) scale(1.12); }
+    }
+
+    /* MODALS & OVERLAYS */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(70, 55, 40, 0.45);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FAF6EE 100%);
+      border: 2px solid var(--border-card);
+      border-radius: 26px;
+      box-shadow: 0 16px 45px rgba(100, 75, 50, 0.22);
+      width: 100%;
+      max-width: 480px;
+      padding: 26px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: var(--text-main);
+    }
+
+    .modal-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+      line-height: 1.35;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-leaf), #219a52);
+      color: #fff;
+      font-family: var(--font-family);
+      font-size: 1rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(39, 174, 96, 0.35);
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(39, 174, 96, 0.5);
+      filter: brightness(1.06);
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.btn-gold {
+      background: linear-gradient(135deg, var(--accent-red), #c0392b);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.35);
+    }
+    .btn.btn-gold:hover {
+      box-shadow: 0 6px 18px rgba(231, 76, 60, 0.5);
+    }
+
+    .btn.btn-secondary {
+      background: #EFE7DA;
+      border: 1px solid var(--border-warm);
+      color: var(--text-main);
+      box-shadow: none;
+    }
+    .btn.btn-secondary:hover {
+      background: #E5DC CE;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: #EFE7DA;
+      border: 1px solid var(--border-warm);
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+      font-size: 1.3rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .modal-close-btn:hover {
+      background: #E5DC CE;
+      color: var(--text-main);
+    }
+
+    /* TITLE SCREEN */
+    #title-screen {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(255, 252, 245, 0.98), rgba(245, 238, 226, 0.99));
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 24px;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    #title-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+
+    .title-logo-icon {
+      font-size: 4.8rem;
+      filter: drop-shadow(0 6px 16px rgba(180, 140, 100, 0.3));
+      animation: bob 3.5s ease-in-out infinite;
+    }
+
+    .title-main-text {
+      font-size: 2.7rem;
+      font-weight: 900;
+      color: #2C241E;
+      text-shadow: 0 2px 8px rgba(180, 150, 120, 0.25);
+      margin-top: 4px;
+      letter-spacing: -1px;
+    }
+    .title-main-text span {
+      color: var(--accent-red);
+    }
+
+    .title-tagline {
+      font-size: 1rem;
+      color: var(--text-sub);
+      margin-top: 6px;
+      margin-bottom: 24px;
+      max-width: 420px;
+      line-height: 1.35;
+    }
+
+    .mode-select-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      background: #EFE7DA;
+      border: 2px solid var(--border-warm);
+      border-radius: 14px;
+      color: var(--text-sub);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mode-btn.active {
+      background: #FFFFFF;
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      box-shadow: 0 2px 10px rgba(231, 76, 60, 0.2);
+    }
+
+    /* RESULTS SCREEN */
+    .results-hero-val {
+      font-size: 3.4rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      text-shadow: 0 2px 12px rgba(231, 76, 60, 0.25);
+      margin: 4px 0 2px 0;
+      line-height: 1.1;
+    }
+    .results-hero-sub {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .rank-stamp {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #e74c3c;
+      border: 4px solid #e74c3c;
+      border-radius: 16px;
+      padding: 2px 18px;
+      transform: rotate(-10deg);
+      margin-bottom: 10px;
+      box-shadow: 0 0 15px rgba(231, 76, 60, 0.25);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      margin: 14px 0;
+    }
+
+    .result-stat-box {
+      background: #F4EEDF;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid var(--border-warm);
+    }
+    .result-stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .result-stat-val {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    /* HOW TO PLAY INSTRUCTIONS CARD */
+    .guide-box {
+      background: #F4EEDF;
+      border-radius: 16px;
+      border: 1px solid var(--border-warm);
+      padding: 14px;
+      margin: 12px 0;
+      text-align: left;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--text-sub);
+    }
+    .guide-box strong {
+      color: var(--accent-red);
+    }
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .step-num {
+      background: var(--accent-leaf);
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.72rem;
+      flex-shrink: 0;
+    }
+
+    /* SETTINGS MODAL */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-warm);
+      font-size: 0.88rem;
+    }
+    .setting-label {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+    .slider {
+      -webkit-appearance: none;
+      width: 120px;
+      height: 6px;
+      border-radius: 4px;
+      background: #E2D7C5;
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-leaf);
+      cursor: pointer;
+    }
+    .toggle-btn {
+      background: #EFE7DA;
+      border: 1px solid var(--border-warm);
+      color: var(--text-sub);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .toggle-btn.active {
+      background: var(--accent-red);
+      color: #fff;
+      border-color: var(--accent-red);
+    }
+
+    /* RESPONSIVE SCALING */
+    @media (max-width: 900px) {
+      #board-canvas {
+        max-width: 100%;
+      }
+      .brand-title {
+        font-size: 1.05rem;
+      }
+      .header-stats {
+        gap: 8px;
+      }
+      .stat-chip {
+        padding: 3px 8px;
+        min-width: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- TOP HEADER -->
+    <header id="top-bar">
+      <div class="brand-group" id="btn-brand-title">
+        <div class="brand-icon">🍎</div>
+        <div class="brand-title" id="txt-brand-title">사과게임 <span>합10</span></div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-chip">
+          <span class="stat-label" id="lbl-harvested">수확</span>
+          <span class="stat-val harvest-val" id="hud-harvested">0</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label" id="lbl-timer">시간</span>
+          <span class="stat-val timer-val" id="hud-timer">120</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label" id="lbl-best">최고 수확</span>
+          <span class="stat-val" id="hud-best">0개</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn lang-btn" id="btn-lang-toggle" title="Language">한국어</button>
+        <button class="icon-btn" id="btn-guide" title="How to Play">❓</button>
+        <button class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
+        <button class="icon-btn" id="btn-pause" title="Pause">⏸️</button>
+      </div>
+    </header>
+
+    <!-- SUB-BAR (MODE & REMAINING APPLES) -->
+    <div id="sub-bar">
+      <div class="mode-badge" id="hud-mode-badge">
+        <span>⏱️</span> <span id="txt-mode-name">120초 타임어택</span>
+      </div>
+
+      <div class="apples-left-chip" id="hud-apples-left">
+        <span id="txt-apples-left-lbl">남은 사과:</span> <strong id="val-apples-left">170</strong> / 170
+      </div>
+    </div>
+
+    <!-- MAIN BOARD CONTAINER -->
+    <main id="board-container">
+      <canvas id="board-canvas" width="850" height="500"></canvas>
+      <div id="sum-tag" class="sum-less">합: 0</div>
+    </main>
+
+    <!-- TITLE SCREEN OVERLAY -->
+    <div id="title-screen">
+      <div class="title-logo-icon">🍎</div>
+      <h1 class="title-main-text" id="title-h1">사과게임 <span>합 10</span></h1>
+      <p class="title-tagline" id="title-tagline">자유롭게 드래그하여 상자 안 사과의 숫자 합이 10이 되면 팡팡 터져요!</p>
+
+      <div class="mode-select-group">
+        <button class="mode-btn active" id="btn-mode-time">⏱️ 120초 타임어택</button>
+        <button class="mode-btn" id="btn-mode-clear">🧩 올클리어 모드</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-gold" id="btn-start-game">🍎 사과 수확 시작</button>
+        <button class="btn btn-secondary" id="btn-open-guide">📖 게임 방법</button>
+        <button class="btn btn-secondary" id="btn-open-settings">⚙️ 환경 설정</button>
+      </div>
+    </div>
+
+    <!-- HOW TO PLAY MODAL -->
+    <div class="modal-overlay" id="guide-modal">
+      <div class="modal-card">
+        <button class="modal-close-btn" id="btn-guide-close">&times;</button>
+        <h2 class="modal-title" id="guide-modal-title">사과게임 규칙</h2>
+        <p class="modal-subtitle" id="guide-modal-sub">자유로운 드래그로 즐기는 합 10 퍼즐!</p>
+
+        <div class="guide-box">
+          <div class="guide-step">
+            <span class="step-num">1</span>
+            <div><strong>자유로운 상자 드래그</strong>: 마우스나 터치로 화면을 자유롭게 드래그하여 원하는 크기의 직사각형 영역을 만듭니다. (칸에 얽매이지 않고 매끄럽게 지정됩니다.)</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">2</span>
+            <div><strong>합 10 만들기</strong>: 상자 안 사과 숫자들의 합이 <strong>정확히 10</strong>이 되면 사과가 팡팡 터집니다! (예: 1+9, 5+5, 2+3+5, 1+2+3+4 등)</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">3</span>
+            <div><strong>보너스 시간</strong>: 타임어택 모드에서 한 번에 4개 이상의 사과를 합쳐 10을 만들면 <strong>+3초 보너스 시간</strong>이 주어집니다!</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" id="btn-guide-confirm">알겠습니다!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE MODAL -->
+    <div class="modal-overlay" id="pause-modal">
+      <div class="modal-card">
+        <button class="modal-close-btn" id="btn-pause-close">&times;</button>
+        <h2 class="modal-title" id="pause-modal-title">잠시 휴식 중</h2>
+        <p class="modal-subtitle" id="pause-modal-sub">과수원에서 잠시 숨을 고릅니다.</p>
+        <div class="modal-actions">
+          <button class="btn" id="btn-pause-resume">▶️ 게임 계속하기</button>
+          <button class="btn btn-secondary" id="btn-pause-restart">🔄 다시 시작</button>
+          <button class="btn btn-secondary" id="btn-pause-title">🏡 메인 화면</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS MODAL -->
+    <div class="modal-overlay" id="results-modal">
+      <div class="modal-card">
+        <div class="rank-stamp" id="results-rank">RANK S</div>
+        <h2 class="modal-title" id="results-modal-title">수확 완료!</h2>
+        <p class="modal-subtitle" id="results-modal-sub">이번 판의 놀라운 수확 성적입니다.</p>
+
+        <div class="results-hero-val" id="results-hero-val">142개</div>
+        <div class="results-hero-sub" id="results-hero-sub">총 170개 중 83% 수확 성공!</div>
+        <div class="stat-label" id="results-best-notice" style="color: var(--accent-red); font-size: 0.85rem; margin-bottom: 12px; display: none;">🌟 최고 수확 신기록 달성! 🌟</div>
+
+        <div class="results-grid">
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-cleared">수확한 사과</span>
+            <span class="result-stat-val" id="results-val-cleared">142개 (83%)</span>
+          </div>
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-remain">남은 사과</span>
+            <span class="result-stat-val" id="results-val-remain">28개</span>
+          </div>
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-best">최고 수확 기록</span>
+            <span class="result-stat-val" id="results-val-best">158개</span>
+          </div>
+          <div class="result-stat-box">
+            <span class="result-stat-label" id="results-lbl-mode">플레이 모드</span>
+            <span class="result-stat-val" id="results-val-mode">120초 타임어택</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-gold" id="btn-results-retry">🍎 다시 플레이</button>
+          <button class="btn btn-secondary" id="btn-results-title">🏡 메인 화면</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="modal-card">
+        <button class="modal-close-btn" id="btn-settings-close">&times;</button>
+        <h2 class="modal-title" id="settings-modal-title">환경 설정</h2>
+        <p class="modal-subtitle" id="settings-modal-sub">사운드 및 언어를 설정합니다.</p>
+
+        <div class="setting-row">
+          <span class="setting-label" id="setting-lbl-lang">언어 (Language)</span>
+          <div class="setting-control">
+            <button class="toggle-btn active" id="setting-lang-ko">한국어</button>
+            <button class="toggle-btn" id="setting-lang-en">English</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label" id="setting-lbl-music">과수원 배경음악</span>
+          <div class="setting-control">
+            <input type="range" class="slider" id="setting-music-vol" min="0" max="100" value="70">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label" id="setting-lbl-sfx">효과음 (사과 팝)</span>
+          <div class="setting-control">
+            <input type="range" class="slider" id="setting-sfx-vol" min="0" max="100" value="85">
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 18px;">
+          <button class="btn btn-secondary" id="btn-settings-done">완료</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+  (function() {
+    'use strict';
+
+    /* Safe LocalStorage Wrapper */
+    const memoryStore = {};
+    const safeStorage = {
+      getItem(key) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            return window.localStorage.getItem(key);
+          }
+        } catch (e) {}
+        return memoryStore[key] || null;
+      },
+      setItem(key, val) {
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            window.localStorage.setItem(key, val);
+            return;
+          }
+        } catch (e) {}
+        memoryStore[key] = String(val);
+      }
+    };
+
+    /* Localization */
+    const I18N = {
+      ko: {
+        brand: "사과게임 <span>합10</span>",
+        tagline: "자유롭게 드래그하여 상자 안 사과의 숫자 합이 10이 되면 팡팡 터져요!",
+        harvestedLabel: "수확",
+        timer: "시간",
+        best: "최고 수확",
+        applesLeft: "남은 사과:",
+        start: "🍎 사과 수확 시작",
+        guide: "📖 게임 방법",
+        settings: "⚙️ 환경 설정",
+        modeTime: "⏱️ 120초 타임어택",
+        modeClear: "🧩 올클리어 모드",
+        pauseTitle: "잠시 휴식 중",
+        pauseSub: "과수원에서 잠시 숨을 고릅니다.",
+        resume: "▶️ 게임 계속하기",
+        restart: "🔄 다시 시작",
+        title: "🏡 메인 화면",
+        resultsTitle: "수확 완료!",
+        resultsSub: "이번 판의 놀라운 수확 성적입니다.",
+        cleared: "수확한 사과",
+        remain: "남은 사과",
+        bestRecord: "최고 수확 기록",
+        mode: "플레이 모드",
+        retry: "🍎 다시 플레이",
+        guideTitle: "사과게임 규칙",
+        guideSub: "자유로운 드래그로 즐기는 합 10 퍼즐!",
+        guideConfirm: "알겠습니다!",
+        settingsTitle: "환경 설정",
+        settingsSub: "사운드 및 언어를 설정합니다.",
+        lang: "언어 (Language)",
+        bgm: "과수원 배경음악",
+        sfx: "효과음 (사과 팝)",
+        done: "완료",
+        timeModeName: "120초 타임어택",
+        clearModeName: "올클리어 모드",
+        sumText: (s) => `합: ${s}`,
+        sumMatch: "합: 10! ✨",
+        bonusTime: "+3초 보너스!",
+        harvestHero: (cnt) => `${cnt}개`,
+        harvestPct: (pct) => `총 170개 중 ${pct}% 수확 성공!`,
+        bestNotice: "🌟 최고 수확 신기록 달성! 🌟",
+        appleUnit: "개"
+      },
+      en: {
+        brand: "Apple Game <span>Make 10</span>",
+        tagline: "Drag freely to select apples! When the numbers sum to 10, they POP!",
+        harvestedLabel: "Harvest",
+        timer: "Time",
+        best: "Best Harvest",
+        applesLeft: "Apples Left:",
+        start: "🍎 Harvest Apples",
+        guide: "📖 How to Play",
+        settings: "⚙️ Settings",
+        modeTime: "⏱️ 120s Time Attack",
+        modeClear: "🧩 All Clear Mode",
+        pauseTitle: "Game Paused",
+        pauseSub: "Catch your breath in the peaceful orchard.",
+        resume: "▶️ Resume Game",
+        restart: "🔄 Restart",
+        title: "🏡 Title Screen",
+        resultsTitle: "Harvest Finished!",
+        resultsSub: "Here is your harvest performance.",
+        cleared: "Harvested Apples",
+        remain: "Remaining Apples",
+        bestRecord: "Best Record",
+        mode: "Game Mode",
+        retry: "🍎 Play Again",
+        guideTitle: "Apple Game Rules",
+        guideSub: "Freeform drag Make-10 puzzle!",
+        guideConfirm: "Got It!",
+        settingsTitle: "Settings",
+        settingsSub: "Tune audio and language.",
+        lang: "Language",
+        bgm: "Orchard Music",
+        sfx: "Sound Effects (Apple Pop)",
+        done: "Done",
+        timeModeName: "120s Time Attack",
+        clearModeName: "All Clear Mode",
+        sumText: (s) => `Sum: ${s}`,
+        sumMatch: "Sum: 10! ✨",
+        bonusTime: "+3s Bonus!",
+        harvestHero: (cnt) => `${cnt} Apples`,
+        harvestPct: (pct) => `${pct}% Harvested out of 170!`,
+        bestNotice: "🌟 NEW BEST HARVEST RECORD! 🌟",
+        appleUnit: " Apples"
+      }
+    };
+
+    let currentLang = safeStorage.getItem('apple_lang') || 'ko';
+    function t(k, ...args) {
+      const dict = I18N[currentLang] || I18N.ko;
+      const v = dict[k];
+      if (typeof v === 'function') return v(...args);
+      return v || k;
+    }
+
+    /* Web Audio Synthesizer */
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.musicGain = null;
+        this.sfxGain = null;
+        this.musicVol = 0.7;
+        this.sfxVol = 0.85;
+        this.musicStep = 0;
+        this.musicTimer = null;
+        this.isMusicPlaying = false;
+      }
+
+      init() {
+        if (this.ctx) return;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          this.ctx = new AC();
+          this.masterGain = this.ctx.createGain();
+          this.musicGain = this.ctx.createGain();
+          this.sfxGain = this.ctx.createGain();
+
+          this.updateVolumes();
+
+          this.musicGain.connect(this.masterGain);
+          this.sfxGain.connect(this.masterGain);
+          this.masterGain.connect(this.ctx.destination);
+
+          this.startMusic();
+        } catch (e) {
+          console.warn("Web Audio init failed:", e);
+        }
+      }
+
+      unlock() {
+        if (!this.ctx) this.init();
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      updateVolumes() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        this.masterGain.gain.setValueAtTime(1.0, now);
+        this.musicGain.gain.setValueAtTime(this.musicVol * 0.35, now);
+        this.sfxGain.gain.setValueAtTime(this.sfxVol, now);
+      }
+
+      startMusic() {
+        if (this.isMusicPlaying || !this.ctx) return;
+        this.isMusicPlaying = true;
+        this.scheduleMusic();
+      }
+
+      scheduleMusic() {
+        if (!this.isMusicPlaying || !this.ctx) return;
+
+        const NOTES = [392.00, 440.00, 493.88, 587.33, 659.25, 783.99];
+        const BASS = [196.00, 220.00, 164.81, 146.83];
+
+        const bar = Math.floor(this.musicStep / 8) % BASS.length;
+        const sub = this.musicStep % 8;
+
+        if (sub === 0) {
+          this.playBassNote(BASS[bar]);
+        }
+
+        const melodyIdx = (sub * 2 + bar) % NOTES.length;
+        if (sub % 2 === 0 || Math.random() > 0.3) {
+          this.playMarimba(NOTES[melodyIdx], 0.22);
+        }
+
+        this.musicStep++;
+        this.musicTimer = setTimeout(() => this.scheduleMusic(), 240);
+      }
+
+      playMarimba(freq, duration) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.musicGain);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.05);
+      }
+
+      playBassNote(freq) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.14, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+        osc.connect(gain);
+        gain.connect(this.musicGain);
+
+        osc.start(now);
+        osc.stop(now + 1.25);
+      }
+
+      playPop() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc.stop(now + 0.16);
+      }
+
+      playMatchChime() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const baseFreq = 659.25;
+
+        const osc = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(baseFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.14);
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(baseFreq * 2, now);
+        osc2.frequency.exponentialRampToValueAtTime(baseFreq * 2.5, now + 0.18);
+
+        gain.gain.setValueAtTime(0.32, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc2.start(now);
+        osc.stop(now + 0.38);
+        osc2.stop(now + 0.38);
+      }
+
+      playThud() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.1);
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc.stop(now + 0.14);
+      }
+
+      playFanfare() {
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          setTimeout(() => {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+
+            osc.start(now);
+            osc.stop(now + 0.55);
+          }, i * 90);
+        });
+      }
+
+      playClick() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(850, now);
+        osc.frequency.exponentialRampToValueAtTime(450, now + 0.04);
+
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+    }
+
+    const audio = new AudioEngine();
+
+    /* Board Configuration */
+    const COLS = 17;
+    const ROWS = 10;
+    const TOTAL_APPLES = COLS * ROWS; // 170
+
+    const CELL_W = 50;
+    const CELL_H = 50;
+
+    let canvas, ctx;
+    let grid = []; // 2D array [row][col]
+
+    let gameMode = 'time'; // 'time' (120s) or 'clear'
+    let timeLeft = 120;
+    let gameTimer = null;
+    let isPlaying = false;
+    let isPaused = false;
+    let inTitle = true;
+
+    /* Harvest Metrics */
+    let harvestedCount = 0;
+    let bestHarvestTime = parseInt(safeStorage.getItem('apple_best_harvest_time') || '0', 10);
+    let bestHarvestClear = parseInt(safeStorage.getItem('apple_best_harvest_clear') || '0', 10);
+
+    /* Freeform Drag Selection State */
+    let isDragging = false;
+    let dragStart = null;
+    let dragCurrent = null;
+
+    let particles = [];
+    let floatingTexts = [];
+
+    class Particle {
+      constructor(x, y, color, size = 4, vx = 0, vy = 0) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = size;
+        this.vx = vx || (Math.random() - 0.5) * 160;
+        this.vy = vy || (Math.random() - 0.5) * 160 - 30;
+        this.alpha = 1.0;
+        this.life = 0.45 + Math.random() * 0.35;
+        this.maxLife = this.life;
+      }
+      update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.vy += 180 * dt;
+        this.life -= dt;
+        this.alpha = Math.max(0, this.life / this.maxLife);
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.fillStyle = this.color;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size * this.alpha, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    class FloatingText {
+      constructor(text, x, y, color = "#E74C3C") {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.alpha = 1.0;
+        this.vy = -60;
+        this.life = 0.85;
+      }
+      update(dt) {
+        this.y += this.vy * dt;
+        this.life -= dt;
+        this.alpha = Math.max(0, this.life / 0.85);
+      }
+      draw(c) {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.font = "900 20px " + getComputedStyle(document.body).fontFamily;
+        c.fillStyle = this.color;
+        c.shadowColor = "rgba(255, 255, 255, 0.9)";
+        c.shadowBlur = 6;
+        c.textAlign = "center";
+        c.fillText(this.text, this.x, this.y);
+        c.restore();
+      }
+    }
+
+    /* Seed Board with Balanced Random Numbers 1 to 9 */
+    function initBoard() {
+      grid = [];
+      const values = [];
+
+      const pairs = [
+        [1, 9], [2, 8], [3, 7], [4, 6], [5, 5],
+        [1, 2, 7], [1, 3, 6], [1, 4, 5], [2, 3, 5], [2, 2, 6],
+        [1, 1, 8], [3, 3, 4], [2, 4, 4]
+      ];
+
+      while (values.length < TOTAL_APPLES) {
+        const p = pairs[Math.floor(Math.random() * pairs.length)];
+        for (let v of p) {
+          if (values.length < TOTAL_APPLES) values.push(v);
+        }
+      }
+
+      for (let i = values.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [values[i], values[j]] = [values[j], values[i]];
+      }
+
+      let valIdx = 0;
+      for (let r = 0; r < ROWS; r++) {
+        grid[r] = [];
+        for (let c = 0; c < COLS; c++) {
+          grid[r][c] = {
+            val: values[valIdx++],
+            active: true,
+            wobble: 0
+          };
+        }
+      }
+
+      updateApplesCount();
+    }
+
+    function updateApplesCount() {
+      let remaining = 0;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (grid[r][c].active) remaining++;
+        }
+      }
+      document.getElementById('val-apples-left').textContent = remaining;
+      return remaining;
+    }
+
+    /* Start / Reset Game */
+    function startGame(mode = 'time') {
+      gameMode = mode;
+      harvestedCount = 0;
+      isDragging = false;
+      dragStart = null;
+      dragCurrent = null;
+      particles = [];
+      floatingTexts = [];
+
+      document.getElementById('hud-harvested').textContent = "0";
+      document.getElementById('txt-mode-name').textContent = gameMode === 'time' ? t("timeModeName") : t("clearModeName");
+
+      const bestVal = gameMode === 'time' ? bestHarvestTime : bestHarvestClear;
+      document.getElementById('hud-best').textContent = `${bestVal}${t("appleUnit")}`;
+
+      initBoard();
+
+      if (gameMode === 'time') {
+        timeLeft = 120;
+        document.getElementById('lbl-timer').textContent = t("timer");
+        document.getElementById('hud-timer').textContent = timeLeft;
+        document.getElementById('hud-timer').classList.remove('warning');
+      } else {
+        timeLeft = 0;
+        document.getElementById('lbl-timer').textContent = "경과";
+        document.getElementById('hud-timer').textContent = "0:00";
+        document.getElementById('hud-timer').classList.remove('warning');
+      }
+
+      if (gameTimer) clearInterval(gameTimer);
+      gameTimer = setInterval(onTimerTick, 1000);
+
+      isPlaying = true;
+      isPaused = false;
+      inTitle = false;
+      document.getElementById('title-screen').classList.add('hidden');
+      closeAllModals();
+    }
+
+    function onTimerTick() {
+      if (!isPlaying || isPaused || inTitle) return;
+
+      if (gameMode === 'time') {
+        timeLeft--;
+        const timerEl = document.getElementById('hud-timer');
+        timerEl.textContent = timeLeft;
+
+        if (timeLeft <= 10) {
+          timerEl.classList.add('warning');
+          audio.playClick();
+        }
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      } else {
+        timeLeft++;
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        document.getElementById('hud-timer').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+    }
+
+    function endGame() {
+      isPlaying = false;
+      if (gameTimer) clearInterval(gameTimer);
+
+      audio.playFanfare();
+
+      const remaining = updateApplesCount();
+      const clearPct = Math.round((harvestedCount / TOTAL_APPLES) * 100);
+
+      let rank = 'D';
+      if (harvestedCount === TOTAL_APPLES) rank = 'S+';
+      else if (harvestedCount >= 150) rank = 'S';
+      else if (harvestedCount >= 120) rank = 'A';
+      else if (harvestedCount >= 85) rank = 'B';
+      else if (harvestedCount >= 50) rank = 'C';
+
+      const resultsModal = document.getElementById('results-modal');
+      document.getElementById('results-rank').textContent = `RANK ${rank}`;
+      document.getElementById('results-hero-val').textContent = t("harvestHero", harvestedCount);
+      document.getElementById('results-hero-sub').textContent = t("harvestPct", clearPct);
+
+      document.getElementById('results-val-cleared').textContent = `${harvestedCount}개 (${clearPct}%)`;
+      document.getElementById('results-val-remain').textContent = `${remaining}개`;
+      document.getElementById('results-val-mode').textContent = gameMode === 'time' ? t("timeModeName") : t("clearModeName");
+
+      let isNewRecord = false;
+      if (gameMode === 'time') {
+        if (harvestedCount > bestHarvestTime) {
+          bestHarvestTime = harvestedCount;
+          safeStorage.setItem('apple_best_harvest_time', bestHarvestTime);
+          isNewRecord = true;
+        }
+        document.getElementById('results-val-best').textContent = `${bestHarvestTime}개`;
+      } else {
+        if (harvestedCount > bestHarvestClear) {
+          bestHarvestClear = harvestedCount;
+          safeStorage.setItem('apple_best_harvest_clear', bestHarvestClear);
+          isNewRecord = true;
+        }
+        document.getElementById('results-val-best').textContent = `${bestHarvestClear}개`;
+      }
+
+      const bestNoticeEl = document.getElementById('results-best-notice');
+      bestNoticeEl.textContent = t("bestNotice");
+      bestNoticeEl.style.display = isNewRecord ? 'block' : 'none';
+
+      resultsModal.classList.add('active');
+    }
+
+    /* Freeform Drag Selection Logic */
+    function getSelectionBox() {
+      if (!dragStart || !dragCurrent) return null;
+      const minX = Math.min(dragStart.x, dragCurrent.x);
+      const maxX = Math.max(dragStart.x, dragCurrent.x);
+      const minY = Math.min(dragStart.y, dragCurrent.y);
+      const maxY = Math.max(dragStart.y, dragCurrent.y);
+      return {
+        minX, maxX, minY, maxY,
+        width: maxX - minX,
+        height: maxY - minY
+      };
+    }
+
+    function getSelectedApples(box) {
+      if (!box) return [];
+      const list = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (!grid[r][c].active) continue;
+          const cx = c * CELL_W + CELL_W / 2;
+          const cy = r * CELL_H + CELL_H / 2;
+          if (cx >= box.minX && cx <= box.maxX && cy >= box.minY && cy <= box.maxY) {
+            list.push({ col: c, row: r, apple: grid[r][c], cx, cy });
+          }
+        }
+      }
+      return list;
+    }
+
+    function resolveSelection() {
+      const box = getSelectionBox();
+      if (!box) return;
+
+      const selected = getSelectedApples(box);
+      if (selected.length === 0) return;
+
+      let sum = 0;
+      for (let s of selected) {
+        sum += s.apple.val;
+      }
+
+      if (sum === 10) {
+        // MATCH SUCCESS (SUM == 10) -> POP!
+        harvestedCount += selected.length;
+        document.getElementById('hud-harvested').textContent = harvestedCount;
+
+        if (gameMode === 'time' && selected.length >= 4) {
+          timeLeft += 3;
+          document.getElementById('hud-timer').textContent = timeLeft;
+          floatingTexts.push(new FloatingText(t("bonusTime"), (box.minX + box.maxX) / 2, box.minY - 10, "#27AE60"));
+        }
+
+        const midX = (box.minX + box.maxX) / 2;
+        const midY = (box.minY + box.maxY) / 2;
+        floatingTexts.push(new FloatingText(`+${selected.length} 🍎`, midX, midY, "#E74C3C"));
+
+        audio.playPop();
+        audio.playMatchChime();
+
+        for (let s of selected) {
+          s.apple.active = false;
+          for (let p = 0; p < 12; p++) {
+            particles.push(new Particle(s.cx, s.cy, Math.random() > 0.3 ? "#E74C3C" : "#27AE60", 3 + Math.random() * 4));
+          }
+        }
+
+        const remaining = updateApplesCount();
+        if (remaining === 0) {
+          endGame();
+        }
+      } else {
+        audio.playThud();
+        for (let s of selected) {
+          s.apple.wobble = 0.25;
+        }
+      }
+    }
+
+    function selectAndResolve(c1, r1, c2, r2) {
+      const minC = Math.min(c1, c2);
+      const maxC = Math.max(c1, c2);
+      const minR = Math.min(r1, r2);
+      const maxR = Math.max(r1, r2);
+
+      dragStart = { x: minC * CELL_W + 5, y: minR * CELL_H + 5 };
+      dragCurrent = { x: (maxC + 1) * CELL_W - 5, y: (maxR + 1) * CELL_H - 5 };
+      resolveSelection();
+      dragStart = null;
+      dragCurrent = null;
+    }
+
+    /* Rendering Canvas Engine */
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Light ivory & subtle soft cream checkered picnic pattern on canvas
+      ctx.fillStyle = "#FFFDF8";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(244, 238, 226, 0.55)";
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if ((r + c) % 2 === 0) {
+            ctx.fillRect(c * CELL_W, r * CELL_H, CELL_W, CELL_H);
+          }
+        }
+      }
+
+      ctx.strokeStyle = "rgba(225, 215, 200, 0.7)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+      const box = getSelectionBox();
+      const selected = getSelectedApples(box);
+      let selectedSum = 0;
+      const selectedSet = new Set(selected.map(s => `${s.col},${s.row}`));
+
+      for (let s of selected) selectedSum += s.apple.val;
+
+      // 1. Draw Apples
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const apple = grid[r][c];
+          if (!apple.active) continue;
+
+          const isSel = selectedSet.has(`${c},${r}`);
+          drawApple(ctx, c, r, apple, isSel);
+        }
+      }
+
+      // 2. Draw Freeform Drag Selection Box
+      if (isDragging && box && (box.width > 2 || box.height > 2)) {
+        ctx.save();
+        if (selectedSum === 10) {
+          ctx.fillStyle = "rgba(39, 174, 96, 0.22)";
+          ctx.strokeStyle = "#27AE60";
+          ctx.shadowColor = "#f1c40f";
+          ctx.shadowBlur = 10;
+        } else if (selectedSum > 10) {
+          ctx.fillStyle = "rgba(231, 76, 60, 0.18)";
+          ctx.strokeStyle = "#E74C3C";
+        } else {
+          ctx.fillStyle = "rgba(41, 128, 185, 0.18)";
+          ctx.strokeStyle = "#2980B9";
+        }
+
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(box.minX, box.minY, box.width, box.height, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 3. Particles & Floating Texts
+      particles.forEach(p => p.draw(ctx));
+      floatingTexts.forEach(ft => ft.draw(ctx));
+    }
+
+    function drawApple(c, col, row, apple, isSelected) {
+      c.save();
+      const cx = col * CELL_W + CELL_W / 2;
+      const cy = row * CELL_H + CELL_H / 2 + 2;
+      const r = 21;
+
+      let wobbleX = 0;
+      if (apple.wobble > 0) {
+        wobbleX = Math.sin(apple.wobble * 40) * 4;
+      }
+      c.translate(cx + wobbleX, cy);
+
+      // Selected Apple Glow Aura
+      if (isSelected) {
+        c.save();
+        c.fillStyle = "rgba(231, 76, 60, 0.22)";
+        c.beginPath();
+        c.arc(0, 0.1 * r, r * 1.25, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+
+      // 1. Soft Warm Apple Shadow on Ivory Canvas
+      c.fillStyle = "rgba(160, 130, 100, 0.2)";
+      c.beginPath();
+      c.ellipse(0, r * 0.92, r * 0.82, r * 0.26, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // 2. Realistic Apple Stem (Curved Wooden Bark)
+      c.save();
+      c.strokeStyle = "#5D4037";
+      c.lineWidth = 2.6;
+      c.lineCap = "round";
+      c.beginPath();
+      c.moveTo(0, -r * 0.52);
+      c.quadraticCurveTo(r * 0.15, -r * 0.95, r * 0.2, -r * 1.05);
+      c.stroke();
+      c.restore();
+
+      // 3. Cheerful Fresh Green Leaf with Delicate Vein
+      c.save();
+      c.translate(r * 0.1, -r * 0.72);
+      c.rotate(0.25);
+      const leafGrad = c.createLinearGradient(0, -r * 0.25, r * 0.45, 0);
+      leafGrad.addColorStop(0, "#4cd137");
+      leafGrad.addColorStop(1, "#10ac84");
+      c.fillStyle = leafGrad;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.quadraticCurveTo(r * 0.18, -r * 0.28, r * 0.46, -r * 0.12);
+      c.quadraticCurveTo(r * 0.22, r * 0.08, 0, 0);
+      c.fill();
+
+      c.strokeStyle = "rgba(255, 255, 255, 0.4)";
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.quadraticCurveTo(r * 0.18, -r * 0.14, r * 0.4, -r * 0.11);
+      c.stroke();
+      c.restore();
+
+      // 4. Plump & Delicious Apple Body Path (Smooth Continuous Bezier Curve)
+      c.save();
+      const bodyGrad = c.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, r * 0.1, r * 1.15);
+      bodyGrad.addColorStop(0, "#ff7675");
+      bodyGrad.addColorStop(0.25, "#ee5253");
+      bodyGrad.addColorStop(0.75, "#d63031");
+      bodyGrad.addColorStop(1, "#8b1e1e");
+
+      c.fillStyle = bodyGrad;
+      c.beginPath();
+      // Top central cleft
+      c.moveTo(0, -r * 0.55);
+      // Top-right lobe
+      c.bezierCurveTo(r * 0.35, -r * 0.85, r * 0.95, -r * 0.65, r * 0.92, -r * 0.08);
+      // Right side down to bottom
+      c.bezierCurveTo(r * 0.88, r * 0.48, r * 0.65, r * 0.88, r * 0.25, r * 0.92);
+      // Bottom dimple
+      c.bezierCurveTo(r * 0.1, r * 0.94, 0, r * 0.78, 0, r * 0.78);
+      c.bezierCurveTo(0, r * 0.78, -r * 0.1, r * 0.94, -r * 0.25, r * 0.92);
+      // Left side from bottom up
+      c.bezierCurveTo(-r * 0.65, r * 0.88, -r * 0.88, r * 0.48, -r * 0.92, -r * 0.08);
+      // Top-left lobe back to cleft
+      c.bezierCurveTo(-r * 0.95, -r * 0.65, -r * 0.35, -r * 0.85, 0, -r * 0.55);
+      c.closePath();
+      c.fill();
+
+      // Delicate outer rim border
+      c.strokeStyle = "rgba(180, 40, 40, 0.4)";
+      c.lineWidth = 1;
+      c.stroke();
+
+      // 5. Glossy Specular Shine (Juicy Apple Highlight)
+      c.fillStyle = "rgba(255, 255, 255, 0.52)";
+      c.beginPath();
+      c.ellipse(-r * 0.42, -r * 0.38, r * 0.26, r * 0.12, -Math.PI / 4, 0, Math.PI * 2);
+      c.fill();
+
+      // Secondary tiny shine dot
+      c.fillStyle = "rgba(255, 255, 255, 0.35)";
+      c.beginPath();
+      c.arc(-r * 0.55, -r * 0.18, r * 0.06, 0, Math.PI * 2);
+      c.fill();
+
+      c.restore();
+
+      // 6. Number in Apple (Super Crisp & Readable)
+      c.save();
+      c.font = "900 22px " + getComputedStyle(document.body).fontFamily;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+
+      // Subtle warm drop shadow for 3D effect
+      c.fillStyle = "rgba(80, 10, 10, 0.45)";
+      c.fillText(apple.val, 0.8, r * 0.08 + 1.2);
+
+      // Clean bright white text
+      c.fillStyle = "#ffffff";
+      c.fillText(apple.val, 0, r * 0.08);
+      c.restore();
+
+      c.restore();
+    }
+
+    /* Main Animation Loop */
+    let lastTime = performance.now();
+
+    function loop(time) {
+      requestAnimationFrame(loop);
+      const dt = Math.min(0.05, (time - lastTime) / 1000);
+      lastTime = time;
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (grid[r] && grid[r][c] && grid[r][c].wobble > 0) {
+            grid[r][c].wobble = Math.max(0, grid[r][c].wobble - dt);
+          }
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update(dt);
+        if (particles[i].life <= 0) particles.splice(i, 1);
+      }
+
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        floatingTexts[i].update(dt);
+        if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
+      }
+
+      render();
+    }
+
+    /* Event Listeners & Freeform Drag Handling */
+    function setupInteractions() {
+      window.addEventListener('pointerdown', () => audio.unlock(), { once: true });
+      window.addEventListener('keydown', () => audio.unlock(), { once: true });
+
+      function getCanvasCoords(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+        return {
+          x: Math.max(0, Math.min(canvas.width, x)),
+          y: Math.max(0, Math.min(canvas.height, y))
+        };
+      }
+
+      function updateSumTag(clientX, clientY) {
+        const sumTag = document.getElementById('sum-tag');
+        const box = getSelectionBox();
+        if (!isDragging || !box) {
+          sumTag.style.display = 'none';
+          return;
+        }
+
+        const selected = getSelectedApples(box);
+        let sum = 0;
+        for (let s of selected) sum += s.apple.val;
+
+        sumTag.style.display = 'block';
+        sumTag.style.left = (clientX) + 'px';
+        sumTag.style.top = (clientY) + 'px';
+
+        if (sum === 10) {
+          sumTag.className = 'sum-match';
+          sumTag.textContent = t("sumMatch");
+        } else if (sum > 10) {
+          sumTag.className = 'sum-over';
+          sumTag.textContent = `${t("sumText", sum)} ❌`;
+        } else {
+          sumTag.className = 'sum-less';
+          sumTag.textContent = t("sumText", sum);
+        }
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!isPlaying || isPaused || inTitle) return;
+        audio.unlock();
+        const coords = getCanvasCoords(e.clientX, e.clientY);
+        isDragging = true;
+        dragStart = coords;
+        dragCurrent = coords;
+        updateSumTag(e.clientX, e.clientY);
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging || !isPlaying || isPaused) return;
+        const coords = getCanvasCoords(e.clientX, e.clientY);
+        dragCurrent = coords;
+        updateSumTag(e.clientX, e.clientY);
+      });
+
+      window.addEventListener('pointerup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        document.getElementById('sum-tag').style.display = 'none';
+        resolveSelection();
+        dragStart = null;
+        dragCurrent = null;
+      });
+
+      // Top Actions & Modals
+      document.getElementById('btn-lang-toggle').addEventListener('click', () => {
+        audio.playClick();
+        setLanguage(currentLang === 'ko' ? 'en' : 'ko');
+      });
+
+      document.getElementById('btn-brand-title').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('title-screen').classList.remove('hidden');
+        inTitle = true;
+      });
+
+      document.getElementById('btn-start-game').addEventListener('click', () => {
+        audio.unlock();
+        audio.playClick();
+        startGame(gameMode);
+      });
+
+      document.getElementById('btn-mode-time').addEventListener('click', () => {
+        audio.playClick();
+        gameMode = 'time';
+        document.getElementById('btn-mode-time').classList.add('active');
+        document.getElementById('btn-mode-clear').classList.remove('active');
+      });
+
+      document.getElementById('btn-mode-clear').addEventListener('click', () => {
+        audio.playClick();
+        gameMode = 'clear';
+        document.getElementById('btn-mode-clear').classList.add('active');
+        document.getElementById('btn-mode-time').classList.remove('active');
+      });
+
+      document.getElementById('btn-guide').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.add('active');
+      });
+      document.getElementById('btn-open-guide').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.add('active');
+      });
+      document.getElementById('btn-guide-close').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.remove('active');
+      });
+      document.getElementById('btn-guide-confirm').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('guide-modal').classList.remove('active');
+      });
+
+      document.getElementById('btn-settings').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.add('active');
+      });
+      document.getElementById('btn-open-settings').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.add('active');
+      });
+      document.getElementById('btn-settings-close').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.remove('active');
+      });
+      document.getElementById('btn-settings-done').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('settings-modal').classList.remove('active');
+      });
+
+      document.getElementById('setting-lang-ko').addEventListener('click', () => {
+        audio.playClick();
+        setLanguage('ko');
+      });
+      document.getElementById('setting-lang-en').addEventListener('click', () => {
+        audio.playClick();
+        setLanguage('en');
+      });
+
+      // Volume Sliders
+      const musicSlider = document.getElementById('setting-music-vol');
+      const sfxSlider = document.getElementById('setting-sfx-vol');
+      musicSlider.addEventListener('input', (e) => {
+        audio.musicVol = parseInt(e.target.value, 10) / 100;
+        audio.updateVolumes();
+      });
+      sfxSlider.addEventListener('input', (e) => {
+        audio.sfxVol = parseInt(e.target.value, 10) / 100;
+        audio.updateVolumes();
+      });
+
+      // Pause Modal
+      document.getElementById('btn-pause').addEventListener('click', () => {
+        if (!isPlaying || inTitle) return;
+        isPaused = true;
+        audio.playClick();
+        document.getElementById('pause-modal').classList.add('active');
+      });
+      document.getElementById('btn-pause-close').addEventListener('click', () => {
+        isPaused = false;
+        audio.playClick();
+        document.getElementById('pause-modal').classList.remove('active');
+      });
+      document.getElementById('btn-pause-resume').addEventListener('click', () => {
+        isPaused = false;
+        audio.playClick();
+        document.getElementById('pause-modal').classList.remove('active');
+      });
+      document.getElementById('btn-pause-restart').addEventListener('click', () => {
+        audio.playClick();
+        startGame(gameMode);
+      });
+      document.getElementById('btn-pause-title').addEventListener('click', () => {
+        audio.playClick();
+        closeAllModals();
+        document.getElementById('title-screen').classList.remove('hidden');
+        inTitle = true;
+      });
+
+      // Results Modal
+      document.getElementById('btn-results-retry').addEventListener('click', () => {
+        audio.playClick();
+        startGame(gameMode);
+      });
+      document.getElementById('btn-results-title').addEventListener('click', () => {
+        audio.playClick();
+        closeAllModals();
+        document.getElementById('title-screen').classList.remove('hidden');
+        inTitle = true;
+      });
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang === 'en' ? 'en' : 'ko';
+      safeStorage.setItem('apple_lang', currentLang);
+
+      document.getElementById('btn-lang-toggle').textContent = currentLang === 'ko' ? '한국어' : 'English';
+      document.getElementById('txt-brand-title').innerHTML = t("brand");
+      document.getElementById('title-h1').innerHTML = t("brand");
+      document.getElementById('title-tagline').textContent = t("tagline");
+
+      document.getElementById('lbl-harvested').textContent = t("harvestedLabel");
+      document.getElementById('lbl-timer').textContent = gameMode === 'time' ? t("timer") : "경과";
+      document.getElementById('lbl-best').textContent = t("best");
+
+      const bestVal = gameMode === 'time' ? bestHarvestTime : bestHarvestClear;
+      document.getElementById('hud-best').textContent = `${bestVal}${t("appleUnit")}`;
+
+      document.getElementById('txt-mode-name').textContent = gameMode === 'time' ? t("timeModeName") : t("clearModeName");
+      document.getElementById('txt-apples-left-lbl').textContent = t("applesLeft");
+
+      document.getElementById('btn-mode-time').textContent = t("modeTime");
+      document.getElementById('btn-mode-clear').textContent = t("modeClear");
+      document.getElementById('btn-start-game').textContent = t("start");
+      document.getElementById('btn-open-guide').textContent = t("guide");
+      document.getElementById('btn-open-settings').textContent = t("settings");
+
+      document.getElementById('pause-modal-title').textContent = t("pauseTitle");
+      document.getElementById('pause-modal-sub').textContent = t("pauseSub");
+      document.getElementById('btn-pause-resume').textContent = t("resume");
+      document.getElementById('btn-pause-restart').textContent = t("restart");
+      document.getElementById('btn-pause-title').textContent = t("title");
+
+      document.getElementById('results-modal-title').textContent = t("resultsTitle");
+      document.getElementById('results-modal-sub').textContent = t("resultsSub");
+      document.getElementById('results-lbl-cleared').textContent = t("cleared");
+      document.getElementById('results-lbl-remain').textContent = t("remain");
+      document.getElementById('results-lbl-best').textContent = t("bestRecord");
+      document.getElementById('results-lbl-mode').textContent = t("mode");
+      document.getElementById('btn-results-retry').textContent = t("retry");
+      document.getElementById('btn-results-title').textContent = t("title");
+
+      document.getElementById('guide-modal-title').textContent = t("guideTitle");
+      document.getElementById('guide-modal-sub').textContent = t("guideSub");
+      document.getElementById('btn-guide-confirm').textContent = t("guideConfirm");
+
+      document.getElementById('settings-modal-title').textContent = t("settingsTitle");
+      document.getElementById('settings-modal-sub').textContent = t("settingsSub");
+      document.getElementById('setting-lbl-lang').textContent = t("lang");
+      document.getElementById('setting-lbl-music').textContent = t("bgm");
+      document.getElementById('setting-lbl-sfx').textContent = t("sfx");
+      document.getElementById('btn-settings-done').textContent = t("done");
+
+      document.getElementById('setting-lang-ko').className = "toggle-btn " + (currentLang === 'ko' ? 'active' : '');
+      document.getElementById('setting-lang-en').className = "toggle-btn " + (currentLang === 'en' ? 'active' : '');
+    }
+
+    // Expose programmatic hooks for automated testing
+    window.AppleGame = {
+      startGame,
+      endGame,
+      selectAndResolve,
+      setLanguage,
+      getHarvested: () => harvestedCount,
+      getGrid: () => grid,
+      getApplesLeft: updateApplesCount,
+      resolveSelection
+    };
+
+    /* Init */
+    window.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('board-canvas');
+      ctx = canvas.getContext('2d');
+
+      setupInteractions();
+      setLanguage(currentLang);
+      initBoard();
+
+      requestAnimationFrame(loop);
+    });
+
+  })();
+  </script>
+</body>
+</html>
