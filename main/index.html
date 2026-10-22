@@ -39,9 +39,9 @@
 
         /* 🌙 다크 모드 */
         [data-theme="dark"] {
-            --bg-color: #08090d;
-            --surface-color: rgba(26, 27, 34, 0.75);
-            --header-bg: rgba(14, 15, 19, 0.75);
+            --bg-color: #06070a;
+            --surface-color: rgba(24, 26, 33, 0.78);
+            --header-bg: rgba(12, 13, 17, 0.75);
             --text-primary: #f2f4f6;
             --text-secondary: #b0b8c1;
             --text-tertiary: #6b7684;
@@ -52,10 +52,10 @@
             --card-hover-shadow: 0 16px 36px rgba(59, 130, 246, 0.3);
             --badge-bg: rgba(39, 42, 49, 0.8);
             --badge-text: #b0b8c1;
-            --input-bg: rgba(26, 27, 34, 0.8);
+            --input-bg: rgba(24, 26, 33, 0.8);
 
             /* 푸터 */
-            --footer-bg: rgba(16, 17, 22, 0.85);
+            --footer-bg: rgba(14, 15, 20, 0.85);
             --footer-text: #6b7684;
             --footer-border: rgba(255, 255, 255, 0.06);
         }
@@ -67,7 +67,7 @@
             transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
         }
 
-        /* 🌌 3D 우주 배경 캔버스 */
+        /* 🌌 3D 공간 캔버스 */
         #space-canvas {
             position: fixed;
             top: 0;
@@ -176,7 +176,7 @@
             font-weight: 800;
             letter-spacing: -0.8px;
             line-height: 1.3;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
         }
 
         .hero-desc {
@@ -247,7 +247,7 @@
             gap: 22px;
         }
 
-        /* 게임 카드 (글래스모피즘 효과) */
+        /* 게임 카드 */
         .game-card {
             display: flex;
             flex-direction: column;
@@ -641,48 +641,78 @@
         </div>
     </footer>
 
-    <!-- Three.js 3D 우주 배경 + 별똥별 + 테마 + 검색 전체 스크립트 -->
+    <!-- Three.js 3D 우주 배경 + 행성 + 별똥별 + 테마 + 검색 전체 스크립트 -->
     <script>
-        // ==========================================
-        // 1. Three.js 3D 우주 배경 & 별똥별(유성) 시스템
-        // ==========================================
+        // =======================================================
+        // 1. Three.js 3D 우주 공간 (둥근 별빛 + 3D 구체 행성 + 유성)
+        // =======================================================
         let scene, camera, renderer, starField, nebulaParticles;
+        let planetSaturnGroup, planetSaturnBody, saturnRing;
+        let planetGasGiant, planetMoon;
         let mouseX = 0, mouseY = 0;
         let targetX = 0, targetY = 0;
 
-        // 🌠 별똥별(유성) 관리
         let shootingStars = [];
         const MAX_SHOOTING_STARS = 3;
+
+        // 🌟 네모난 각진 점을 방지하는 원형 부드러운 빛(Glow) 텍스처 즉석 생성
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.2, 'rgba(230, 240, 255, 0.85)');
+            gradient.addColorStop(0.5, 'rgba(120, 160, 255, 0.35)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+
+            return new THREE.CanvasTexture(canvas);
+        }
 
         function initSpaceBackground() {
             const canvas = document.getElementById('space-canvas');
             scene = new THREE.Scene();
 
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2500);
-            camera.position.z = 500;
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.z = 600;
 
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            // 기본 배경 별(Starfield) 생성
-            const starCount = 2200;
+            // 우주 광원 (행성의 명암과 입체감을 살려주는 조명)
+            const ambientLight = new THREE.AmbientLight(0x334155, 1.2);
+            scene.add(ambientLight);
+
+            const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.4);
+            sunLight.position.set(600, 400, 500);
+            scene.add(sunLight);
+
+            const circleTexture = createCircleTexture();
+
+            // 1. 둥근 별 입자(Starfield) 생성
+            const starCount = 2000;
             const starGeometry = new THREE.BufferGeometry();
             const starPositions = new Float32Array(starCount * 3);
             const starColors = new Float32Array(starCount * 3);
 
             const starColorsList = [
                 new THREE.Color(0xffffff),
-                new THREE.Color(0x93c5fd), // 파스텔 블루
-                new THREE.Color(0xc084fc), // 파스텔 퍼플
-                new THREE.Color(0x67e8f9)  // 시안
+                new THREE.Color(0xa5c9ff), // 아이스 블루
+                new THREE.Color(0xd8b4fe), // 연보라
+                new THREE.Color(0x7dd3fc)  // 스카이
             ];
 
             for (let i = 0; i < starCount; i++) {
                 const i3 = i * 3;
-                starPositions[i3] = (Math.random() - 0.5) * 1600;
-                starPositions[i3 + 1] = (Math.random() - 0.5) * 1600;
-                starPositions[i3 + 2] = (Math.random() - 0.5) * 1600;
+                starPositions[i3] = (Math.random() - 0.5) * 2000;
+                starPositions[i3 + 1] = (Math.random() - 0.5) * 2000;
+                starPositions[i3 + 2] = (Math.random() - 0.5) * 2000;
 
                 const color = starColorsList[Math.floor(Math.random() * starColorsList.length)];
                 starColors[i3] = color.r;
@@ -694,32 +724,35 @@
             starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
             const starMaterial = new THREE.PointsMaterial({
-                size: 2.2,
+                size: 8,
+                map: circleTexture,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.85
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
             });
 
             starField = new THREE.Points(starGeometry, starMaterial);
             scene.add(starField);
 
-            // 성운 구름 파티클 생성
-            const nebulaCount = 120;
+            // 2. 성운 가스 구름
+            const nebulaCount = 100;
             const nebulaGeometry = new THREE.BufferGeometry();
             const nebulaPositions = new Float32Array(nebulaCount * 3);
             const nebulaColors = new Float32Array(nebulaCount * 3);
 
             const nebulaPalette = [
-                new THREE.Color(0x3b82f6),
-                new THREE.Color(0x8b5cf6),
-                new THREE.Color(0xec4899)
+                new THREE.Color(0x2563eb),
+                new THREE.Color(0x7c3aed),
+                new THREE.Color(0xdb2777)
             ];
 
             for (let i = 0; i < nebulaCount; i++) {
                 const i3 = i * 3;
-                nebulaPositions[i3] = (Math.random() - 0.5) * 1200;
-                nebulaPositions[i3 + 1] = (Math.random() - 0.5) * 1200;
-                nebulaPositions[i3 + 2] = (Math.random() - 0.5) * 800;
+                nebulaPositions[i3] = (Math.random() - 0.5) * 1400;
+                nebulaPositions[i3 + 1] = (Math.random() - 0.5) * 1400;
+                nebulaPositions[i3 + 2] = (Math.random() - 0.5) * 900;
 
                 const color = nebulaPalette[Math.floor(Math.random() * nebulaPalette.length)];
                 nebulaColors[i3] = color.r;
@@ -731,28 +764,80 @@
             nebulaGeometry.setAttribute('color', new THREE.BufferAttribute(nebulaColors, 3));
 
             const nebulaMaterial = new THREE.PointsMaterial({
-                size: 28,
+                size: 90,
+                map: circleTexture,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.25,
-                blending: THREE.AdditiveBlending
+                opacity: 0.22,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
             });
 
             nebulaParticles = new THREE.Points(nebulaGeometry, nebulaMaterial);
             scene.add(nebulaParticles);
 
-            // 별똥별 풀(Pool) 생성
+            // 3. 🪐 고리 달린 토성 스타일 행성 (화면 우측 상단 배치)
+            planetSaturnGroup = new THREE.Group();
+            
+            // 행성 본체 (매끄러운 구체)
+            const saturnGeo = new THREE.SphereGeometry(65, 48, 48);
+            const saturnMat = new THREE.MeshStandardMaterial({
+                color: 0xdfb76c,
+                roughness: 0.65,
+                metalness: 0.15
+            });
+            planetSaturnBody = new THREE.Mesh(saturnGeo, saturnMat);
+            planetSaturnGroup.add(planetSaturnBody);
+
+            // 토성 고리 (얇은 링 형태)
+            const ringGeo = new THREE.RingGeometry(85, 140, 64);
+            const ringMat = new THREE.MeshStandardMaterial({
+                color: 0xc49c58,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.75,
+                roughness: 0.8
+            });
+            saturnRing = new THREE.Mesh(ringGeo, ringMat);
+            saturnRing.rotation.x = Math.PI / 2.3;
+            saturnRing.rotation.y = Math.PI / 8;
+            planetSaturnGroup.add(saturnRing);
+
+            planetSaturnGroup.position.set(450, 180, -250);
+            planetSaturnGroup.rotation.z = 0.35;
+            scene.add(planetSaturnGroup);
+
+            // 4. 🔵 푸른 가스 거대 행성 + 위성 (화면 좌측 하단 배치)
+            const giantGeo = new THREE.SphereGeometry(85, 48, 48);
+            const giantMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                roughness: 0.5,
+                metalness: 0.2
+            });
+            planetGasGiant = new THREE.Mesh(giantGeo, giantMat);
+            planetGasGiant.position.set(-480, -260, -350);
+            scene.add(planetGasGiant);
+
+            // 작은 위성(Moon)
+            const moonGeo = new THREE.SphereGeometry(14, 32, 32);
+            const moonMat = new THREE.MeshStandardMaterial({
+                color: 0xe2e8f0,
+                roughness: 0.8
+            });
+            planetMoon = new THREE.Mesh(moonGeo, moonMat);
+            scene.add(planetMoon);
+
+            // 5. 별똥별 풀 생성
             for (let i = 0; i < MAX_SHOOTING_STARS; i++) {
                 createShootingStar();
             }
 
-            // 마우스 움직임 감지
+            // 이벤트 바인딩
             window.addEventListener('mousemove', (e) => {
                 mouseX = (e.clientX - window.innerWidth / 2) * 0.25;
                 mouseY = (e.clientY - window.innerHeight / 2) * 0.25;
             });
 
-            // 화면 크기 변경 대응
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
@@ -762,13 +847,13 @@
             animateSpace();
         }
 
-        // 별똥별 생성 함수
+        // 별똥별(유성) 생성
         function createShootingStar() {
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array([0, 0, 0, 0, 0, 0]);
             const colors = new Float32Array([
-                1.0, 1.0, 1.0, // 머리: 흰색
-                0.2, 0.5, 1.0  // 꼬리: 네온 블루
+                1.0, 1.0, 1.0,
+                0.2, 0.5, 1.0
             ]);
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -788,7 +873,7 @@
             const starObj = {
                 mesh: line,
                 active: false,
-                tailLength: 70,
+                tailLength: 75,
                 speed: 18,
                 vx: 0,
                 vy: 0,
@@ -813,7 +898,7 @@
             star.vz = (Math.random() - 0.5) * 2;
 
             star.active = true;
-            star.mesh.material.opacity = 0.9;
+            star.mesh.material.opacity = 0.95;
         }
 
         function updateShootingStars() {
@@ -846,18 +931,39 @@
             });
         }
 
+        let clock = 0;
+
         function animateSpace() {
             requestAnimationFrame(animateSpace);
+            clock += 0.015;
 
+            // 우주 성운 & 별빛 미세 회전
             if (starField) {
-                starField.rotation.y += 0.0004;
-                starField.rotation.x += 0.00015;
+                starField.rotation.y += 0.0003;
+                starField.rotation.x += 0.0001;
             }
 
             if (nebulaParticles) {
-                nebulaParticles.rotation.y += 0.0002;
+                nebulaParticles.rotation.y += 0.00015;
             }
 
+            // 🪐 토성 자전
+            if (planetSaturnGroup) {
+                planetSaturnBody.rotation.y += 0.004;
+                saturnRing.rotation.z += 0.001;
+            }
+
+            // 🔵 가스 거대 행성 자전 및 위성 공전
+            if (planetGasGiant) {
+                planetGasGiant.rotation.y += 0.003;
+                
+                // 가스 행성 주위를 공전하는 위성 궤도 계산
+                planetMoon.position.x = planetGasGiant.position.x + Math.cos(clock * 0.7) * 140;
+                planetMoon.position.z = planetGasGiant.position.z + Math.sin(clock * 0.7) * 140;
+                planetMoon.position.y = planetGasGiant.position.y + Math.sin(clock * 0.7) * 35;
+            }
+
+            // 마우스 부드러운 시차 추적 (Lerp)
             targetX += (mouseX - targetX) * 0.04;
             targetY += (mouseY - targetY) * 0.04;
 
