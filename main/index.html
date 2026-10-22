@@ -13,10 +13,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
-        /* ☀️ 라이트 모드 (기본) */
+        /* ☀️ 라이트 모드 */
         :root {
-            --bg-color: #f0f3f8;
-            --surface-color: rgba(255, 255, 255, 0.85);
+            --bg-color: #f1f4f9;
+            --surface-color: rgba(255, 255, 255, 0.82);
             --header-bg: rgba(255, 255, 255, 0.75);
             --text-primary: #191f28;
             --text-secondary: #4e5968;
@@ -24,40 +24,38 @@
             --border-color: rgba(229, 232, 235, 0.8);
             --accent-color: #3182f6;
             --accent-hover: #1b64da;
-            --card-shadow: 0 8px 24px rgba(149, 157, 165, 0.12);
-            --card-hover-shadow: 0 16px 36px rgba(49, 130, 246, 0.2);
-            --badge-bg: rgba(242, 244, 246, 0.9);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --card-hover-shadow: 0 18px 40px rgba(49, 130, 246, 0.22);
+            --badge-bg: rgba(242, 244, 246, 0.85);
             --badge-text: #4e5968;
             --input-bg: rgba(255, 255, 255, 0.9);
             
-            /* 푸터 */
-            --footer-bg: rgba(242, 244, 246, 0.85);
+            --footer-bg: rgba(242, 244, 246, 0.8);
             --footer-text: #8b95a1;
             --footer-border: rgba(229, 232, 235, 0.8);
             --transition-speed: 0.25s ease;
         }
 
-        /* 🌙 다크 모드 */
+        /* 🌙 다크 모드 (딥 스페이스) */
         [data-theme="dark"] {
-            --bg-color: #06070a;
-            --surface-color: rgba(24, 26, 33, 0.78);
-            --header-bg: rgba(12, 13, 17, 0.75);
+            --bg-color: #030408;
+            --surface-color: rgba(18, 20, 28, 0.72);
+            --header-bg: rgba(8, 10, 16, 0.75);
             --text-primary: #f2f4f6;
             --text-secondary: #b0b8c1;
             --text-tertiary: #6b7684;
-            --border-color: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.1);
             --accent-color: #3b82f6;
             --accent-hover: #60a5fa;
-            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-            --card-hover-shadow: 0 16px 36px rgba(59, 130, 246, 0.3);
-            --badge-bg: rgba(39, 42, 49, 0.8);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --card-hover-shadow: 0 18px 42px rgba(59, 130, 246, 0.35);
+            --badge-bg: rgba(35, 38, 48, 0.8);
             --badge-text: #b0b8c1;
-            --input-bg: rgba(24, 26, 33, 0.8);
+            --input-bg: rgba(18, 20, 28, 0.8);
 
-            /* 푸터 */
-            --footer-bg: rgba(14, 15, 20, 0.85);
+            --footer-bg: rgba(10, 12, 18, 0.85);
             --footer-text: #6b7684;
-            --footer-border: rgba(255, 255, 255, 0.06);
+            --footer-border: rgba(255, 255, 255, 0.08);
         }
 
         * {
@@ -97,8 +95,8 @@
             z-index: 100;
             background-color: var(--header-bg);
             border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .nav-container {
@@ -122,14 +120,13 @@
         }
 
         .logo-badge {
-            background-color: var(--accent-color);
+            background: linear-gradient(135deg, #3182f6, #8b5cf6);
             color: white;
             font-size: 0.72rem;
             font-weight: 700;
             padding: 3px 8px;
             border-radius: 6px;
-            letter-spacing: 0;
-            box-shadow: 0 2px 8px rgba(49, 130, 246, 0.4);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
         }
 
         .theme-btn {
@@ -163,7 +160,7 @@
             z-index: 1;
         }
 
-        /* 히어로 인트로 & 검색 영역 */
+        /* 히어로 인트로 & 검색 */
         .hero-section {
             margin-bottom: 36px;
             display: flex;
@@ -172,28 +169,29 @@
         }
 
         .hero-title {
-            font-size: 1.95rem;
+            font-size: 2.1rem;
             font-weight: 800;
             letter-spacing: -0.8px;
             line-height: 1.3;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
         }
 
         .hero-desc {
             color: var(--text-secondary);
             font-size: 1.05rem;
             margin-top: 4px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .search-bar-wrap {
             position: relative;
-            max-width: 460px;
+            max-width: 480px;
             margin-top: 8px;
         }
 
         .search-input {
             width: 100%;
-            padding: 13px 18px 13px 44px;
+            padding: 14px 18px 14px 44px;
             border-radius: 14px;
             border: 1px solid var(--border-color);
             background-color: var(--input-bg);
@@ -202,13 +200,13 @@
             font-family: inherit;
             outline: none;
             box-shadow: var(--card-shadow);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
         .search-input:focus {
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.25);
+            box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.3);
         }
 
         .search-icon {
@@ -220,16 +218,15 @@
             font-size: 0.95rem;
         }
 
-        /* 게임 카운트 텍스트 */
         .grid-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         .grid-title {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 700;
             letter-spacing: -0.4px;
         }
@@ -240,14 +237,13 @@
             font-weight: 600;
         }
 
-        /* 게임 그리드 */
         .game-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 22px;
         }
 
-        /* 게임 카드 */
+        /* 하이엔드 글래스모피즘 카드 */
         .game-card {
             display: flex;
             flex-direction: column;
@@ -259,8 +255,8 @@
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
             transform: translateY(0);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, border-color 0.25s ease;
         }
 
@@ -270,7 +266,6 @@
             border-color: var(--accent-color);
         }
 
-        /* 썸네일 래퍼 */
         .thumb-wrapper {
             width: 100%;
             aspect-ratio: 16 / 10;
@@ -287,10 +282,9 @@
         }
 
         .game-card:hover .thumb-wrapper img {
-            transform: scale(1.06);
+            transform: scale(1.07);
         }
 
-        /* 카드 내용 영역 */
         .card-body {
             padding: 16px 18px 18px;
             display: flex;
@@ -335,13 +329,6 @@
             color: var(--accent-color);
         }
 
-        .card-action span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* 검색 결과 없음 */
         .no-result {
             grid-column: 1 / -1;
             text-align: center;
@@ -351,7 +338,6 @@
             display: none;
         }
 
-        /* 푸터 */
         .site-footer {
             background-color: var(--footer-bg);
             padding: 36px 20px 40px;
@@ -359,8 +345,8 @@
             color: var(--footer-text);
             text-align: center;
             font-size: 13px;
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             position: relative;
             z-index: 1;
         }
@@ -407,49 +393,24 @@
             margin-top: 2px;
         }
 
-        /* 반응형 모바일 */
         @media (max-width: 640px) {
-            .nav-container {
-                padding: 12px 16px;
-            }
-
-            main {
-                padding: 24px 16px 40px;
-            }
-
-            .hero-title {
-                font-size: 1.45rem;
-            }
-
-            .game-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 14px;
-            }
-
-            .card-body {
-                padding: 12px 14px 14px;
-                gap: 8px;
-            }
-
-            .game-name {
-                font-size: 0.95rem;
-            }
-
-            .card-action {
-                display: none;
-            }
+            .nav-container { padding: 12px 16px; }
+            main { padding: 24px 16px 40px; }
+            .hero-title { font-size: 1.55rem; }
+            .game-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .card-body { padding: 12px 14px 14px; gap: 8px; }
+            .game-name { font-size: 0.95rem; }
+            .card-action { display: none; }
         }
 
         @media (max-width: 380px) {
-            .game-grid {
-                grid-template-columns: 1fr;
-            }
+            .game-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 🌌 3D 공간 캔버스 요소 -->
+    <!-- 🌌 시네마틱 3D 우주 캔버스 -->
     <canvas id="space-canvas"></canvas>
 
     <header>
@@ -483,7 +444,6 @@
         </div>
 
         <div class="game-grid" id="gameGrid">
-            <!-- AI 오목 -->
             <a href="game/오목m.html" class="game-card" data-title="AI 오목 대결 오목 바둑">
                 <div class="thumb-wrapper">
                     <img src="../img/오목.png" alt="AI 오목 대결" loading="lazy">
@@ -500,7 +460,6 @@
                 </div>
             </a>
 
-            <!-- 2048 -->
             <a href="game/2048.html" class="game-card" data-title="2048 퍼즐 숫자">
                 <div class="thumb-wrapper">
                     <img src="../img/2048.png" alt="2048 게임" loading="lazy">
@@ -517,7 +476,6 @@
                 </div>
             </a>
 
-            <!-- 반응속도 테스트 -->
             <a href="game/반응속도 테스트.html" class="game-card" data-title="반응속도 테스트 순발력 피지컬">
                 <div class="thumb-wrapper">
                     <img src="../img/반응속도.png" alt="반응속도 테스트" loading="lazy">
@@ -534,7 +492,6 @@
                 </div>
             </a>
 
-            <!-- 스네이크 -->
             <a href="game/snake.html" class="game-card" data-title="스네이크 뱀 지렁이 아케이드">
                 <div class="thumb-wrapper">
                     <img src="../img/스네이크.png" alt="스네이크 게임" loading="lazy">
@@ -551,7 +508,6 @@
                 </div>
             </a>
 
-            <!-- AI 체스 -->
             <a href="game/chess.html" class="game-card" data-title="AI 체스 대결 체스 보드게임 chess">
                 <div class="thumb-wrapper">
                     <img src="../img/chess.jpg" alt="AI 체스 대결" loading="lazy">
@@ -568,7 +524,6 @@
                 </div>
             </a>
             
-            <!-- space(수박게임) -->
             <a href="game/space game.html" class="game-card" data-title="수박게임 space">
                 <div class="thumb-wrapper">
                     <img src="../img/space.png" alt="space(수박게임)" loading="lazy">
@@ -585,7 +540,6 @@
                 </div>
             </a>
             
-            <!-- 사과게임 -->
             <a href="game/사과게임.html" class="game-card" data-title="사과게임">
                 <div class="thumb-wrapper">
                     <img src="../img/사과.png" alt="사과게임" loading="lazy">
@@ -602,7 +556,6 @@
                 </div>
             </a>
 
-            <!-- 컬러타일 -->
             <a href="game/컬러타일.html" class="game-card" data-title="컬러타일">
                 <div class="thumb-wrapper">
                     <img src="../img/컬러타일.png" alt="컬러타일" loading="lazy">
@@ -619,14 +572,12 @@
                 </div>
             </a>
 
-            <!-- 검색 결과 없음 안내 -->
             <div id="noResult" class="no-result">
                 검색된 게임이 없습니다. 다른 키워드로 검색해 보세요.
             </div>
         </div>
     </main>
 
-    <!-- 푸터 -->
     <footer class="site-footer">
         <div class="footer-content">
             <div class="policy-links">
@@ -641,201 +592,258 @@
         </div>
     </footer>
 
-    <!-- Three.js 3D 우주 배경 + 행성 + 별똥별 + 테마 + 검색 전체 스크립트 -->
+    <!-- 🌌 하이엔드 3D 셰이더 우주 엔진 -->
     <script>
-        // =======================================================
-        // 1. Three.js 3D 우주 공간 (둥근 별빛 + 3D 구체 행성 + 유성)
-        // =======================================================
-        let scene, camera, renderer, starField, nebulaParticles;
-        let planetSaturnGroup, planetSaturnBody, saturnRing;
-        let planetGasGiant, planetMoon;
-        let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
-
+        let scene, camera, renderer;
+        let starPoints, starPositions, starSpeeds;
+        let jupiterPlanet, jupiterAtmo;
+        let neptunePlanet, neptuneAtmo, saturnRings;
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
         let shootingStars = [];
-        const MAX_SHOOTING_STARS = 3;
+        const MAX_SHOOTING_STARS = 2;
 
-        // 🌟 네모난 각진 점을 방지하는 원형 부드러운 빛(Glow) 텍스처 즉석 생성
-        function createCircleTexture() {
+        // 1. 프로시저럴(절차적) 고해상도 행성 텍스처 생성기
+        function generateProceduralPlanetTexture(type) {
             const canvas = document.createElement('canvas');
-            canvas.width = 64;
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            if (type === 'jupiter') {
+                // 목성형 가스 밴드 & 대적점 패턴
+                const bands = [
+                    '#3b2f2f', '#7d5c42', '#d4a373', '#e9edc9',
+                    '#faedcd', '#bc6c25', '#dda15e', '#603808'
+                ];
+                for (let y = 0; y < 512; y++) {
+                    const n = Math.sin(y * 0.05) + Math.sin(y * 0.12) * 0.5;
+                    const bandIdx = Math.floor(Math.abs(Math.sin(y * 0.02 + n * 0.3) * bands.length)) % bands.length;
+                    ctx.fillStyle = bands[bandIdx];
+                    ctx.fillRect(0, y, 1024, 1);
+                }
+                // 표면 노이즈 & 소용돌이
+                for (let i = 0; i < 2000; i++) {
+                    ctx.fillStyle = `rgba(255, 230, 200, ${Math.random() * 0.15})`;
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * 1024, Math.random() * 512, Math.random() * 15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                // 거대 폭풍점 (Great Red Spot)
+                const spotGrad = ctx.createRadialGradient(680, 310, 10, 680, 310, 60);
+                spotGrad.addColorStop(0, 'rgba(180, 50, 30, 0.85)');
+                spotGrad.addColorStop(0.7, 'rgba(140, 40, 25, 0.4)');
+                spotGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = spotGrad;
+                ctx.beginPath();
+                ctx.ellipse(680, 310, 80, 45, 0.1, 0, Math.PI * 2);
+                ctx.fill();
+
+            } else if (type === 'neptune') {
+                // 신비로운 네온 해왕성/빙하 가스 패턴
+                const grad = ctx.createLinearGradient(0, 0, 0, 512);
+                grad.addColorStop(0, '#0a192f');
+                grad.addColorStop(0.2, '#172a45');
+                grad.addColorStop(0.5, '#0077b6');
+                grad.addColorStop(0.7, '#00b4d8');
+                grad.addColorStop(1, '#03045e');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 1024, 512);
+
+                // 고속 백색 메탄 구름 줄무늬
+                for (let i = 0; i < 18; i++) {
+                    const y = Math.random() * 512;
+                    ctx.fillStyle = 'rgba(202, 240, 248, 0.25)';
+                    ctx.fillRect(0, y, 1024, Math.random() * 8 + 2);
+                }
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            return texture;
+        }
+
+        // 2. 카시니 간극을 포함한 토성 입체 고리 텍스처
+        function generateRingTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
             canvas.height = 64;
             const ctx = canvas.getContext('2d');
 
-            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.2, 'rgba(230, 240, 255, 0.85)');
-            gradient.addColorStop(0.5, 'rgba(120, 160, 255, 0.35)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            const grad = ctx.createLinearGradient(0, 0, 512, 0);
+            grad.addColorStop(0.0, 'rgba(0,0,0,0)');
+            grad.addColorStop(0.15, 'rgba(180, 150, 110, 0.85)');
+            grad.addColorStop(0.45, 'rgba(215, 185, 145, 0.9)');
+            grad.addColorStop(0.50, 'rgba(0, 0, 0, 0.1)'); // 카시니 틈(Gap)
+            grad.addColorStop(0.55, 'rgba(190, 160, 125, 0.7)');
+            grad.addColorStop(0.85, 'rgba(140, 110, 80, 0.4)');
+            grad.addColorStop(1.0, 'rgba(0,0,0,0)');
 
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 64);
 
             return new THREE.CanvasTexture(canvas);
         }
 
-        function initSpaceBackground() {
+        // 3. 고화질 발광 점 텍스처
+        function createHighResGlowParticle() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.2, 'rgba(210, 230, 255, 0.8)');
+            grad.addColorStop(0.5, 'rgba(90, 150, 255, 0.3)');
+            grad.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 128, 128);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function initHighEndSpace() {
             const canvas = document.getElementById('space-canvas');
             scene = new THREE.Scene();
 
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-            camera.position.z = 600;
+            camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.z = 700;
 
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            // 우주 광원 (행성의 명암과 입체감을 살려주는 조명)
-            const ambientLight = new THREE.AmbientLight(0x334155, 1.2);
-            scene.add(ambientLight);
+            // 현실적인 우주 라이팅 (주 광원 + 림 라이트 반사광)
+            const mainSun = new THREE.DirectionalLight(0xfff5e4, 3.2);
+            mainSun.position.set(700, 350, 450);
+            scene.add(mainSun);
 
-            const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.4);
-            sunLight.position.set(600, 400, 500);
-            scene.add(sunLight);
+            const spaceFillLight = new THREE.DirectionalLight(0x3b82f6, 0.8);
+            spaceFillLight.position.set(-600, -300, -200);
+            scene.add(spaceFillLight);
 
-            const circleTexture = createCircleTexture();
+            const ambient = new THREE.AmbientLight(0x0f172a, 1.2);
+            scene.add(ambient);
 
-            // 1. 둥근 별 입자(Starfield) 생성
-            const starCount = 2000;
-            const starGeometry = new THREE.BufferGeometry();
-            const starPositions = new Float32Array(starCount * 3);
+            const glowTexture = createHighResGlowParticle();
+
+            // 🌌 깊이감 있는 3D 별빛 필드 (Warp Speed 이동)
+            const starCount = 2400;
+            const starGeo = new THREE.BufferGeometry();
+            starPositions = new Float32Array(starCount * 3);
+            starSpeeds = new Float32Array(starCount);
             const starColors = new Float32Array(starCount * 3);
 
-            const starColorsList = [
+            const starPalette = [
                 new THREE.Color(0xffffff),
-                new THREE.Color(0xa5c9ff), // 아이스 블루
-                new THREE.Color(0xd8b4fe), // 연보라
-                new THREE.Color(0x7dd3fc)  // 스카이
+                new THREE.Color(0x93c5fd),
+                new THREE.Color(0xc4b5fd),
+                new THREE.Color(0x67e8f9)
             ];
 
             for (let i = 0; i < starCount; i++) {
                 const i3 = i * 3;
-                starPositions[i3] = (Math.random() - 0.5) * 2000;
-                starPositions[i3 + 1] = (Math.random() - 0.5) * 2000;
+                starPositions[i3] = (Math.random() - 0.5) * 2400;
+                starPositions[i3 + 1] = (Math.random() - 0.5) * 2400;
                 starPositions[i3 + 2] = (Math.random() - 0.5) * 2000;
+                starSpeeds[i] = Math.random() * 0.4 + 0.15; // 앞으로 다가오는 속도
 
-                const color = starColorsList[Math.floor(Math.random() * starColorsList.length)];
-                starColors[i3] = color.r;
-                starColors[i3 + 1] = color.g;
-                starColors[i3 + 2] = color.b;
+                const c = starPalette[Math.floor(Math.random() * starPalette.length)];
+                starColors[i3] = c.r;
+                starColors[i3 + 1] = c.g;
+                starColors[i3 + 2] = c.b;
             }
 
-            starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-            starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-            const starMaterial = new THREE.PointsMaterial({
-                size: 8,
-                map: circleTexture,
+            const starMat = new THREE.PointsMaterial({
+                size: 7.5,
+                map: glowTexture,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.9,
+                opacity: 0.95,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false
             });
 
-            starField = new THREE.Points(starGeometry, starMaterial);
-            scene.add(starField);
+            starPoints = new THREE.Points(starGeo, starMat);
+            scene.add(starPoints);
 
-            // 2. 성운 가스 구름
-            const nebulaCount = 100;
-            const nebulaGeometry = new THREE.BufferGeometry();
-            const nebulaPositions = new Float32Array(nebulaCount * 3);
-            const nebulaColors = new Float32Array(nebulaCount * 3);
+            // 🪐 1. 디테일 목성(Jupiter) + 대기 림 글로우 (우측 상단)
+            const jupiterTexture = generateProceduralPlanetTexture('jupiter');
+            const jupiterGeo = new THREE.SphereGeometry(95, 64, 64);
+            const jupiterMat = new THREE.MeshStandardMaterial({
+                map: jupiterTexture,
+                roughness: 0.75,
+                metalness: 0.1
+            });
+            jupiterPlanet = new THREE.Mesh(jupiterGeo, jupiterMat);
 
-            const nebulaPalette = [
-                new THREE.Color(0x2563eb),
-                new THREE.Color(0x7c3aed),
-                new THREE.Color(0xdb2777)
-            ];
-
-            for (let i = 0; i < nebulaCount; i++) {
-                const i3 = i * 3;
-                nebulaPositions[i3] = (Math.random() - 0.5) * 1400;
-                nebulaPositions[i3 + 1] = (Math.random() - 0.5) * 1400;
-                nebulaPositions[i3 + 2] = (Math.random() - 0.5) * 900;
-
-                const color = nebulaPalette[Math.floor(Math.random() * nebulaPalette.length)];
-                nebulaColors[i3] = color.r;
-                nebulaColors[i3 + 1] = color.g;
-                nebulaColors[i3 + 2] = color.b;
-            }
-
-            nebulaGeometry.setAttribute('position', new THREE.BufferAttribute(nebulaPositions, 3));
-            nebulaGeometry.setAttribute('color', new THREE.BufferAttribute(nebulaColors, 3));
-
-            const nebulaMaterial = new THREE.PointsMaterial({
-                size: 90,
-                map: circleTexture,
-                vertexColors: true,
+            // 대기 아우라(Atmosphere Glow Mesh)
+            const atmoGeo = new THREE.SphereGeometry(98, 64, 64);
+            const atmoMat = new THREE.MeshBasicMaterial({
+                color: 0xffaa66,
                 transparent: true,
-                opacity: 0.22,
+                opacity: 0.18,
                 blending: THREE.AdditiveBlending,
-                depthWrite: false
+                side: THREE.BackSide
             });
+            jupiterAtmo = new THREE.Mesh(atmoGeo, atmoMat);
+            jupiterPlanet.add(jupiterAtmo);
 
-            nebulaParticles = new THREE.Points(nebulaGeometry, nebulaMaterial);
-            scene.add(nebulaParticles);
-
-            // 3. 🪐 고리 달린 토성 스타일 행성 (화면 우측 상단 배치)
-            planetSaturnGroup = new THREE.Group();
-            
-            // 행성 본체 (매끄러운 구체)
-            const saturnGeo = new THREE.SphereGeometry(65, 48, 48);
-            const saturnMat = new THREE.MeshStandardMaterial({
-                color: 0xdfb76c,
-                roughness: 0.65,
-                metalness: 0.15
-            });
-            planetSaturnBody = new THREE.Mesh(saturnGeo, saturnMat);
-            planetSaturnGroup.add(planetSaturnBody);
-
-            // 토성 고리 (얇은 링 형태)
-            const ringGeo = new THREE.RingGeometry(85, 140, 64);
+            // 정교한 토성형 링
+            const ringGeo = new THREE.RingGeometry(125, 230, 96);
+            const ringTexture = generateRingTexture();
             const ringMat = new THREE.MeshStandardMaterial({
-                color: 0xc49c58,
+                map: ringTexture,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.75,
+                opacity: 0.9,
                 roughness: 0.8
             });
-            saturnRing = new THREE.Mesh(ringGeo, ringMat);
-            saturnRing.rotation.x = Math.PI / 2.3;
-            saturnRing.rotation.y = Math.PI / 8;
-            planetSaturnGroup.add(saturnRing);
+            saturnRings = new THREE.Mesh(ringGeo, ringMat);
+            saturnRings.rotation.x = Math.PI / 2.3;
+            saturnRings.rotation.y = Math.PI / 10;
+            jupiterPlanet.add(saturnRings);
 
-            planetSaturnGroup.position.set(450, 180, -250);
-            planetSaturnGroup.rotation.z = 0.35;
-            scene.add(planetSaturnGroup);
+            jupiterPlanet.position.set(460, 180, -280);
+            jupiterPlanet.rotation.z = 0.25;
+            scene.add(jupiterPlanet);
 
-            // 4. 🔵 푸른 가스 거대 행성 + 위성 (화면 좌측 하단 배치)
-            const giantGeo = new THREE.SphereGeometry(85, 48, 48);
-            const giantMat = new THREE.MeshStandardMaterial({
+            // 🔵 2. 네온 심우주 가스 행성(Neptune) (좌측 하단)
+            const neptuneTexture = generateProceduralPlanetTexture('neptune');
+            const neptuneGeo = new THREE.SphereGeometry(75, 64, 64);
+            const neptuneMat = new THREE.MeshStandardMaterial({
+                map: neptuneTexture,
+                roughness: 0.45,
+                metalness: 0.25
+            });
+            neptunePlanet = new THREE.Mesh(neptuneGeo, neptuneMat);
+
+            const neptuneAtmoGeo = new THREE.SphereGeometry(78, 64, 64);
+            const neptuneAtmoMat = new THREE.MeshBasicMaterial({
                 color: 0x38bdf8,
-                roughness: 0.5,
-                metalness: 0.2
+                transparent: true,
+                opacity: 0.28,
+                blending: THREE.AdditiveBlending,
+                side: THREE.BackSide
             });
-            planetGasGiant = new THREE.Mesh(giantGeo, giantMat);
-            planetGasGiant.position.set(-480, -260, -350);
-            scene.add(planetGasGiant);
+            neptuneAtmo = new THREE.Mesh(neptuneAtmoGeo, neptuneAtmoMat);
+            neptunePlanet.add(neptuneAtmo);
 
-            // 작은 위성(Moon)
-            const moonGeo = new THREE.SphereGeometry(14, 32, 32);
-            const moonMat = new THREE.MeshStandardMaterial({
-                color: 0xe2e8f0,
-                roughness: 0.8
-            });
-            planetMoon = new THREE.Mesh(moonGeo, moonMat);
-            scene.add(planetMoon);
+            neptunePlanet.position.set(-520, -240, -320);
+            scene.add(neptunePlanet);
 
-            // 5. 별똥별 풀 생성
+            // 유성 풀 초기화
             for (let i = 0; i < MAX_SHOOTING_STARS; i++) {
                 createShootingStar();
             }
 
-            // 이벤트 바인딩
+            // 마우스 인터랙션 바인딩
             window.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX - window.innerWidth / 2) * 0.25;
-                mouseY = (e.clientY - window.innerHeight / 2) * 0.25;
+                mouseX = (e.clientX - window.innerWidth / 2) * 0.35;
+                mouseY = (e.clientY - window.innerHeight / 2) * 0.35;
             });
 
             window.addEventListener('resize', () => {
@@ -844,17 +852,14 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
 
-            animateSpace();
+            animateSpaceScene();
         }
 
-        // 별똥별(유성) 생성
+        // 별똥별
         function createShootingStar() {
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array([0, 0, 0, 0, 0, 0]);
-            const colors = new Float32Array([
-                1.0, 1.0, 1.0,
-                0.2, 0.5, 1.0
-            ]);
+            const colors = new Float32Array([1, 1, 1, 0.2, 0.6, 1]);
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -870,33 +875,27 @@
             const line = new THREE.Line(geometry, material);
             scene.add(line);
 
-            const starObj = {
+            shootingStars.push({
                 mesh: line,
                 active: false,
-                tailLength: 75,
-                speed: 18,
-                vx: 0,
-                vy: 0,
-                vz: 0,
+                tailLength: 90,
+                speed: 22,
+                vx: 0, vy: 0, vz: 0,
                 currentPos: new THREE.Vector3(),
-                delay: Math.random() * 200 + 80
-            };
-
-            shootingStars.push(starObj);
+                delay: Math.random() * 250 + 80
+            });
         }
 
         function resetShootingStar(star) {
             star.currentPos.set(
-                (Math.random() - 0.2) * 1200,
-                Math.random() * 300 + 300,
+                (Math.random() - 0.2) * 1400,
+                Math.random() * 400 + 350,
                 (Math.random() - 0.5) * 600
             );
-
-            const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
+            const angle = Math.PI / 4.2 + (Math.random() - 0.5) * 0.25;
             star.vx = -Math.cos(angle) * star.speed;
             star.vy = -Math.sin(angle) * star.speed;
-            star.vz = (Math.random() - 0.5) * 2;
-
+            star.vz = (Math.random() - 0.5) * 3;
             star.active = true;
             star.mesh.material.opacity = 0.95;
         }
@@ -905,9 +904,7 @@
             shootingStars.forEach(star => {
                 if (!star.active) {
                     star.delay--;
-                    if (star.delay <= 0) {
-                        resetShootingStar(star);
-                    }
+                    if (star.delay <= 0) resetShootingStar(star);
                     return;
                 }
 
@@ -923,47 +920,39 @@
                 posAttr.setXYZ(1, tailPos.x, tailPos.y, tailPos.z);
                 posAttr.needsUpdate = true;
 
-                if (star.currentPos.y < -500 || star.currentPos.x < -800) {
+                if (star.currentPos.y < -600 || star.currentPos.x < -900) {
                     star.active = false;
                     star.mesh.material.opacity = 0;
-                    star.delay = Math.random() * 300 + 150;
+                    star.delay = Math.random() * 320 + 160;
                 }
             });
         }
 
-        let clock = 0;
+        function animateSpaceScene() {
+            requestAnimationFrame(animateSpaceScene);
 
-        function animateSpace() {
-            requestAnimationFrame(animateSpace);
-            clock += 0.015;
+            // 1. 별들의 우주 공간 전진 (Warp Field)
+            const pos = starPoints.geometry.attributes.position.array;
+            for (let i = 0; i < starSpeeds.length; i++) {
+                const i3 = i * 3;
+                pos[i3 + 2] += starSpeeds[i] * 1.5; // 카메라 앞으로 서서히 이동
+                if (pos[i3 + 2] > 700) {
+                    pos[i3 + 2] = -1200; // 카메라를 지나치면 다시 저 멀리 리셋
+                }
+            }
+            starPoints.geometry.attributes.position.needsUpdate = true;
+            starPoints.rotation.y += 0.0002;
 
-            // 우주 성운 & 별빛 미세 회전
-            if (starField) {
-                starField.rotation.y += 0.0003;
-                starField.rotation.x += 0.0001;
+            // 2. 행성 자전 & 텍스처 오프셋 롤링
+            if (jupiterPlanet) {
+                jupiterPlanet.rotation.y += 0.0025;
+                saturnRings.rotation.z += 0.0006;
+            }
+            if (neptunePlanet) {
+                neptunePlanet.rotation.y += 0.0035;
             }
 
-            if (nebulaParticles) {
-                nebulaParticles.rotation.y += 0.00015;
-            }
-
-            // 🪐 토성 자전
-            if (planetSaturnGroup) {
-                planetSaturnBody.rotation.y += 0.004;
-                saturnRing.rotation.z += 0.001;
-            }
-
-            // 🔵 가스 거대 행성 자전 및 위성 공전
-            if (planetGasGiant) {
-                planetGasGiant.rotation.y += 0.003;
-                
-                // 가스 행성 주위를 공전하는 위성 궤도 계산
-                planetMoon.position.x = planetGasGiant.position.x + Math.cos(clock * 0.7) * 140;
-                planetMoon.position.z = planetGasGiant.position.z + Math.sin(clock * 0.7) * 140;
-                planetMoon.position.y = planetGasGiant.position.y + Math.sin(clock * 0.7) * 35;
-            }
-
-            // 마우스 부드러운 시차 추적 (Lerp)
+            // 3. 마우스 부드러운 카메라 패닝
             targetX += (mouseX - targetX) * 0.04;
             targetY += (mouseY - targetY) * 0.04;
 
@@ -978,11 +967,11 @@
         function updateSpaceTheme(theme) {
             const canvas = document.getElementById('space-canvas');
             if (!canvas) return;
-            canvas.style.opacity = theme === 'dark' ? '1' : '0.45';
+            canvas.style.opacity = theme === 'dark' ? '1' : '0.5';
         }
 
         // ==========================================
-        // 2. 테마 모드 제어 (다크 / 라이트)
+        // UI 테마 및 실시간 검색 시스템
         // ==========================================
         function initTheme() {
             const savedTheme = localStorage.getItem('site-theme') || 'dark';
@@ -1012,9 +1001,6 @@
             applyTheme(currentTheme);
         }
 
-        // ==========================================
-        // 3. 실시간 게임 검색 기능
-        // ==========================================
         function filterGames() {
             const query = document.getElementById('gameSearch').value.toLowerCase().trim();
             const cards = document.querySelectorAll('.game-card');
@@ -1035,12 +1021,9 @@
             noResult.style.display = visibleCount === 0 ? 'block' : 'none';
         }
 
-        // ==========================================
-        // 4. 페이지 로드 초기화
-        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
-            initSpaceBackground();
+            initHighEndSpace();
         });
     </script>
 </body>
