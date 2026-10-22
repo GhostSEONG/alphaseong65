@@ -1,19 +1,451 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인정보처리방침</title>
+    <title>개인정보처리방침 - 심심풀이 Arcade</title>
+    
+    <!-- Pretendard 폰트 CDN -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+    <style>
+        /* ☀️ 라이트 모드 (기본) */
+        :root {
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --text-primary: #191f28;
+            --text-secondary: #4e5968;
+            --text-tertiary: #8b95a1;
+            --border-color: #e5e8eb;
+            --accent-color: #3182f6;
+            --accent-hover: #1b64da;
+            --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            --badge-bg: #f2f4f6;
+            --badge-text: #4e5968;
+            
+            /* 푸터 */
+            --footer-bg: #f2f4f6;
+            --footer-text: #8b95a1;
+            --footer-border: #e5e8eb;
+            --transition-speed: 0.25s ease;
+        }
+
+        /* 🌙 다크 모드 */
+        [data-theme="dark"] {
+            --bg-color: #121316;
+            --surface-color: #1c1d22;
+            --header-bg: rgba(18, 19, 22, 0.85);
+            --text-primary: #f2f4f6;
+            --text-secondary: #b0b8c1;
+            --text-tertiary: #6b7684;
+            --border-color: #2b2e35;
+            --accent-color: #3b82f6;
+            --accent-hover: #60a5fa;
+            --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            --badge-bg: #272a31;
+            --badge-text: #b0b8c1;
+
+            /* 푸터 */
+            --footer-bg: #16171a;
+            --footer-text: #6b7684;
+            --footer-border: #24262c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 네비게이션 헤더 */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-badge {
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            letter-spacing: 0;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-color);
+            background-color: var(--badge-bg);
+        }
+
+        .theme-btn {
+            background-color: var(--badge-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* 본문 컨테이너 */
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .policy-header {
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            background-color: rgba(49, 130, 246, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            margin-bottom: 8px;
+        }
+
+        .last-updated {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        /* 약관 카드 레이아웃 */
+        .policy-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 36px 32px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .policy-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .policy-section:not(:last-child) {
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: var(--badge-bg);
+            color: var(--accent-color);
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+
+        .section-desc a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .section-desc a:hover {
+            border-color: var(--accent-color);
+        }
+
+        /* 푸터 */
+        .site-footer {
+            background-color: var(--footer-bg);
+            padding: 36px 20px 40px;
+            border-top: 1px solid var(--footer-border);
+            color: var(--footer-text);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .policy-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .policy-links a {
+            color: var(--footer-text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .policy-links a:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .policy-links .separator {
+            opacity: 0.4;
+        }
+
+        .copyright {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .contact-info {
+            font-size: 12px;
+            color: var(--footer-text);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 640px) {
+            .nav-container {
+                padding: 12px 16px;
+            }
+
+            main {
+                padding: 32px 16px 60px;
+            }
+
+            .policy-card {
+                padding: 24px 20px;
+                border-radius: 16px;
+                gap: 24px;
+            }
+
+            .page-title {
+                font-size: 1.6rem;
+            }
+
+            .section-title {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p><strong>1. 구글 애드센스 및 쿠키(Cookie) 사용</strong><br>
-            본 웹사이트(AlphaSeong)는 구글 애드센스(Google AdSense) 광고를 게재하기 위해 준비 중이며, Google을 포함한 타사 공급업체는 쿠키를 사용하여 사용자가 본 웹사이트 또는 인터넷의 다른 웹사이트를 과거에 방문한 기록을 기반으로 광고를 게재합니다.<br>
-            Google이 광고 쿠키를 사용함에 따라, Google 및 Google 파트너는 사용자가 본 사이트 및 인터넷의 다른 사이트를 방문한 기록을 기반으로 사용자에게 적절한 맞춤 광고를 제공할 수 있습니다.</p>
-            
-            <p><strong>2. 맞춤 광고 선택 해제 (Opt-out)</strong><br>
-            방문자는 <a href="https://myadcenter.google.com/" target="_blank" style="color: #0056b3; text-decoration: none;">Google 광고 설정</a> 페이지를 방문하여 맞춤 광고를 선택 해제할 수 있습니다. 또한 <a href="https://www.aboutads.info" target="_blank" style="color: #0056b3; text-decoration: none;">aboutads.info</a>를 방문하시면 타사 공급업체의 맞춤 광고 쿠키 사용을 직접 해제하실 수 있습니다.</p>
-            
-            <p><strong>3. 정보 수집 및 이용 목적</strong><br>
-            본 사이트에서 구동되는 모드 게임은 사용자의 로컬 브라우저 환경에서만 실행되며, 웹사이트 자체적으로 방문자의 민감한 개인정보(이름, 주민등록번호, 연락처 등)를 별도로 수집하거나 서버에 저장하지 않습니다. 단, 웹사이트 트렌드 분석 및 서비스 개선을 위해 구글 애널리틱스 등 통계 도구에 의한 익명화된 접속 로그가 수집될 수 있습니다.</p>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                🎮 심심풀이
+                <span class="logo-badge">Arcade</span>
+            </a>
+            <div class="nav-right">
+                <a href="index.html" class="back-link">← 홈으로</a>
+                <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span> <span id="themeText">다크 모드</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="policy-header">
+            <span class="page-badge">Privacy Policy</span>
+            <h1 class="page-title">개인정보처리방침</h1>
+            <p class="last-updated">최종 수정일: 2026년 10월 22일</p>
+        </section>
+
+        <article class="policy-card">
+            <!-- 1. 구글 애드센스 및 쿠키 사용 -->
+            <section class="policy-section">
+                <h2 class="section-title">
+                    <span class="section-number">1</span>
+                    구글 애드센스 및 쿠키(Cookie) 사용
+                </h2>
+                <p class="section-desc">
+                    본 웹사이트(AlphaSeong)는 구글 애드센스(Google AdSense) 광고를 게재하기 위해 준비 중이며, Google을 포함한 타사 공급업체는 쿠키를 사용하여 사용자가 본 웹사이트 또는 인터넷의 다른 웹사이트를 과거에 방문한 기록을 기반으로 광고를 게재합니다.
+                </p>
+                <p class="section-desc">
+                    Google이 광고 쿠키를 사용함에 따라, Google 및 Google 파트너는 사용자가 본 사이트 및 인터넷의 다른 사이트를 방문한 기록을 기반으로 사용자에게 적절한 맞춤 광고를 제공할 수 있습니다.
+                </p>
+            </section>
+
+            <!-- 2. 맞춤 광고 선택 해제 -->
+            <section class="policy-section">
+                <h2 class="section-title">
+                    <span class="section-number">2</span>
+                    맞춤 광고 선택 해제 (Opt-out)
+                </h2>
+                <p class="section-desc">
+                    방문자는 <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer">Google 광고 설정</a> 페이지를 방문하여 맞춤 광고를 선택 해제할 수 있습니다. 또한 <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer">aboutads.info</a>를 방문하시면 타사 공급업체의 맞춤 광고 쿠키 사용을 직접 해제하실 수 있습니다.
+                </p>
+            </section>
+
+            <!-- 3. 정보 수집 및 이용 목적 -->
+            <section class="policy-section">
+                <h2 class="section-title">
+                    <span class="section-number">3</span>
+                    정보 수집 및 이용 목적
+                </h2>
+                <p class="section-desc">
+                    본 사이트에서 구동되는 모든 미니게임은 사용자의 로컬 브라우저 환경에서만 독립적으로 실행되며, 웹사이트 자체적으로 방문자의 민감한 개인정보(이름, 주민등록번호, 연락처 등)를 별도로 수집하거나 서버에 저장하지 않습니다.
+                </p>
+                <p class="section-desc">
+                    단, 웹사이트 트렌드 분석 및 서비스 품질 개선을 위해 구글 애널리틱스 등 통계 도구에 의한 익명화된 접속 로그가 수집될 수 있습니다.
+                </p>
+            </section>
+        </article>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="policy-links">
+                <a href="Privacy Policy.html">개인정보처리방침</a>
+                <span class="separator">|</span>
+                <a href="Copyright & Disclaimer.html">저작권 및 면책 조항</a>
+            </div>
+            <div class="copyright">
+                &copy; 2026 AlphaSeong. All rights reserved.
+                <div class="contact-info">Contact: alpharoll65@gmail.com</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 테마 동기화 스크립트 -->
+    <script>
+        function initTheme() {
+            const savedTheme = localStorage.getItem('site-theme') || 'dark';
+            applyTheme(savedTheme);
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (theme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.innerText = '☀️';
+                themeText.innerText = '라이트 모드';
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.innerText = '🌙';
+                themeText.innerText = '다크 모드';
+            }
+            localStorage.setItem('site-theme', theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', initTheme);
+    </script>
 </body>
 </html>
